@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (payload: AuthResponse) => {
     setAccess(payload.access);
     setUser(payload.user);
+    console.log(payload.user)
     localStorage.setItem("user", JSON.stringify(payload.user));
   };
 

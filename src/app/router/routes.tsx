@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
+import { CreateTeamPage } from '../../features/teams/pages/CreateTeamPage';
 
 export const router = createBrowserRouter([
   {
@@ -10,6 +11,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/teams/create',
+    element: <CreateTeamPage />,
   },
   // Default redirect or landing can be added here
 ]);
