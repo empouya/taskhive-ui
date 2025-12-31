@@ -42,7 +42,7 @@ export const authApi = {
   refresh: async (): Promise<string> => {
     try {
       const { data } = await authClient.post('/auth/token/refresh/');
-      return data;
+      return data.access;
     } catch (error) {
       throw normalizeError(error);
     }

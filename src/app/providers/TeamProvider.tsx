@@ -7,7 +7,7 @@ import axios from 'axios';
 const TeamContext = createContext<any>(undefined);
 
 export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { access, user } = useAuth();
+  const { access } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
   const [activeTeam, setActiveTeamState] = useState<Team | null>(() => {
     const saved = localStorage.getItem('activeTeam');
