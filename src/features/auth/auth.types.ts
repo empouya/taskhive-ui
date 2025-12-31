@@ -9,11 +9,17 @@ export interface RegisterCredentials {
   password_confirm?: string;
 }
 
-export interface RegisterResponse {
+export interface AuthResponse {
+  access: string;
   user: User
 }
 
 export interface AuthError {
   message: string;
   field?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password?: string;
 }

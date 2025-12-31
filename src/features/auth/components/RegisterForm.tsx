@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserPlus, Mail, Lock, Loader2 } from 'lucide-react';
 import { authApi } from '../auth.api';
 
 export const RegisterForm: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,11 +33,10 @@ export const RegisterForm: React.FC = () => {
     setError(null);
 
     try {
-      const response = await authApi.register(formData);
-      console.log('Registration successful:', response.user);
-
+      await authApi.register(formData);
+      console.log('Registration successful:');
       alert('Account created successfully!');
-
+      navigate('/login');
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred');
     } finally {
