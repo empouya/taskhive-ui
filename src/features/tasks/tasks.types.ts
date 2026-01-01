@@ -17,3 +17,17 @@ export interface UpdateTaskPayload {
   priority?: TaskPriority;
   title?: string;
 }
+
+export interface Comment {
+  id: string;
+  author: {
+    id: string;
+    email: string;
+  };
+  content: string;
+  created_at: string;
+}
+
+export interface TaskDetail extends Task {
+  comments: Comment[];
+}

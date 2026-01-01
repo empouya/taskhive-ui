@@ -4,29 +4,35 @@ import type { Task, TaskPriority } from '../tasks.types';
 
 interface TaskRowProps {
   task: Task;
+  isSelected?: boolean;
   onUpdate: (id: string, payload: any) => void;
+  onSelect: (task: Task) => void;
 }
 
-export const TaskRow: React.FC<TaskRowProps> = ({ task, onUpdate }) => {
+export const TaskRow: React.FC<TaskRowProps> = ({ task, isSelected, onUpdate, onSelect }) => {
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'DONE';
 
   const statusIcons = {
-    todo: <Circle className="w-5 h-5 text-slate-300" />,
-    in_progress: <Clock className="w-5 h-5 text-blue-500 animate-pulse" />,
-    done: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    TODO: <Circle className="w-5 h-5 text-slate-300" />,
+    IN_PROGRESS: <Clock className="w-5 h-5 text-blue-500 animate-pulse" />,
+    DONE: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
   };
 
   const priorityColors = {
-    low: 'bg-slate-100 text-slate-600',
-    medium: 'bg-indigo-50 text-indigo-600',
-    high: 'bg-orange-50 text-orange-600'
+    LOW: 'bg-slate-100 text-slate-600',
+    MEDIUM: 'bg-indigo-50 text-indigo-600',
+    HIGH: 'bg-orange-50 text-orange-600'
   };
 
   return (
-    <div className="group flex items-center gap-4 p-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
-      {/* Status Toggle (Minimal Clicks) */}
-      <button 
-        onClick={() => onUpdate(task.id, { status: task.status === 'DONE' ? 'TODO' : 'DONE' })}
+    <div onClick={() => onSelect(task)}
+      className={`group flex items-center gap-4 p-4 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'bg-white dark:bg-slate-900'
+        }`}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onUpdate(task.id, { status: task.status === 'DONE' ? 'TODO' : 'DONE' });
+        }}
         className="flex-shrink-0 transition-transform active:scale-90"
       >
         {statusIcons[task.status]}
