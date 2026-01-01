@@ -12,7 +12,7 @@ export const TeamSwitcher: React.FC = () => {
     <div className="relative w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700"
+        className="flex items-center justify-between w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer"
       >
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="flex-shrink-0 w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold text-xs">

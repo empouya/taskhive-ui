@@ -23,7 +23,7 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
-      <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="h-21 p-4 border-b border-slate-100 dark:border-slate-800">
         <TeamSwitcher />
       </div>
 

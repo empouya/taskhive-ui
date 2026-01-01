@@ -1,12 +1,12 @@
 import React from 'react';
-import { Bell, User, LogOut } from 'lucide-react';
+import { Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../../app/providers/AuthProvider';
 
 export const TopBar: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header className="h-16 flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 z-30">
+    <header className="h-21 flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 z-30">
       {/* CONTEXTUAL PAGE TITLE */}
       <h2 className="text-sm font-bold text-slate-900 dark:text-white">
         Dashboard
