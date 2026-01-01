@@ -15,10 +15,15 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   });
   const [isLoading, setIsLoading] = useState(false);
 
+
   // Fetch teams when authenticated
   useEffect(() => {
     const fetchTeams = async () => {
-      if (!access) return;
+      if (!access) {
+        setTeams([]);
+        setActiveTeamState(null);
+        return
+      }
       setIsLoading(true);
       try {
         const { data } = await axios.get('http://localhost:8000/api/v1/teams/', {
@@ -26,7 +31,7 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           withCredentials: true
         });
         setTeams(data);
-        
+
         // If no active team is set, or current active team isn't in the list, set the first one
         if (!activeTeam || !data.find((t: Team) => t.id === activeTeam.id)) {
           if (data.length > 0) handleSetActiveTeam(data[0]);
@@ -44,7 +49,6 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleSetActiveTeam = (team: Team) => {
     setActiveTeamState(team);
     localStorage.setItem('activeTeam', JSON.stringify(team));
-    // Implementation Detail: In Step 3, we will trigger a state reset across project/task stores here
   };
 
   return (
