@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Check, Users } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { useTeam } from '../../../app/providers/TeamProvider';
 
 export const TeamSwitcher: React.FC = () => {
