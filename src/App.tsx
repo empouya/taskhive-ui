@@ -12,6 +12,7 @@ import { ProjectsPage } from './features/projects/pages/ProjectsPage';
 import { TaskListPage } from './features/tasks/pages/TaskListPage';
 import { CreateTeamPage } from './features/teams/pages/CreateTeamPage';
 import { CreateTaskPage } from './features/tasks/pages/CreateTaskPage';
+import { TeamSelectionPage } from './features/teams/pages/TeamSelectionPage';
 
 export default function App() {
 
@@ -24,13 +25,14 @@ export default function App() {
             {/* PUBLIC ROUTES */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/teams/select" element={<TeamSelectionPage />} />
 
             {/* AUTHENTICATED ROUTES (Wrapped in Global UX) */}
             <Route element={<AuthLayout />}>
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:projectId" element={<TaskListPage />} />
               <Route path="/projects/:projectId/tasks/new" element={<CreateTaskPage />} />
-              <Route path="/teams/new" element={<CreateTeamPage />} />
+              <Route path="/teams/create" element={<CreateTeamPage />} />
               
               {/* Default Redirect */}
               <Route path="/" element={<Navigate to="/projects" replace />} />

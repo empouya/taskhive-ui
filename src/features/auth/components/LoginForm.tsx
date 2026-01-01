@@ -29,7 +29,7 @@ export const LoginForm: React.FC = () => {
 
       login(response);
 
-      navigate('/teams/create');
+      navigate('/teams/select');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {

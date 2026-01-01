@@ -11,21 +11,22 @@ export const CreateTeamForm: React.FC = () => {
   const navigate = useNavigate();
   
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!access) {
-        alert("You are not logged in yet");
-        return;
+      alert("You are not logged in yet");
+      return;
     }
     
     setIsLoading(true);
     setError(null);
 
     try {
-      const newTeam = await teamsApi.create(name, access);
+      const newTeam = await teamsApi.create(name, description, access);
       setActiveTeam(newTeam);
       navigate('/projects');
     } catch (err: any) {
@@ -45,9 +46,9 @@ export const CreateTeamForm: React.FC = () => {
         <p className="text-slate-500 text-sm mt-2">Bring your projects and members together.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Team Name</label>
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Team Name</label>
           <input
             required
             autoFocus
@@ -56,7 +57,20 @@ export const CreateTeamForm: React.FC = () => {
             className="w-full h-11 px-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             placeholder="e.g. Marketing Titans"
           />
-          
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+             Description <span className="text-[10px] text-slate-400 font-normal">(Optional)</span>
+          </label>
+          <div className="relative">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none h-24"
+              placeholder="What is this team working on?"
+            />
+          </div>
         </div>
 
         {error && (
