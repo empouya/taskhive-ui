@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import type { User, AuthResponse } from '../../features/auth/auth.types';
 import { authApi } from '../../features/auth/auth.api';
 
@@ -39,7 +39,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setAccess(null);
       setUser(null);
+
       localStorage.removeItem("user");
+      localStorage.removeItem("activeTeam");
+
+      window.location.href = '/login';
     }
   }, []);
 
