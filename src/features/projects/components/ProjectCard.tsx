@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Archive, Folder, Lock, ArrowRight } from 'lucide-react';
 import type { Project } from '../projects.types';
 
@@ -12,16 +13,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, isAdmin, onAr
   const isArchived = project.is_archived;
 
   return (
-    <div className={`group relative p-6 rounded-2xl border transition-all ${
-      isArchived 
-        ? 'bg-slate-50/50 border-slate-200 grayscale opacity-75' 
-        : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 shadow-sm'
-    }`}>
+    <div className={`group relative p-6 rounded-2xl border transition-all ${isArchived
+      ? 'bg-slate-50/50 border-slate-200 grayscale opacity-75'
+      : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 shadow-sm'
+      }`}>
       <div className="flex justify-between items-start mb-4">
         <div className={`p-2 rounded-lg ${isArchived ? 'bg-slate-200' : 'bg-primary/10'}`}>
           <Folder className={`w-5 h-5 ${isArchived ? 'text-slate-500' : 'text-primary'}`} />
         </div>
-        
+
         {isAdmin && !isArchived && (
           <button
             onClick={() => onArchive(project.id)}
@@ -46,9 +46,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, isAdmin, onAr
             <Lock className="w-3 h-3" /> Archived
           </span>
         ) : (
-          <button className="flex items-center text-sm font-semibold text-primary group-hover:gap-2 transition-all">
+          <Link
+            to={`/projects/${project.id}/tasks`}
+            className="flex items-center text-sm font-semibold text-primary group-hover:gap-2 transition-all"
+          >
             Open Project <ArrowRight className="w-4 h-4 ml-1" />
-          </button>
+          </Link>
         )}
       </div>
     </div>
