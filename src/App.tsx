@@ -13,6 +13,7 @@ import { TaskListPage } from './features/tasks/pages/TaskListPage';
 import { CreateTeamPage } from './features/teams/pages/CreateTeamPage';
 import { CreateTaskPage } from './features/tasks/pages/CreateTaskPage';
 import { TeamSelectionPage } from './features/teams/pages/TeamSelectionPage';
+import { AcceptInvitePage } from './features/teams/pages/AcceptInvitePage';
 
 export default function App() {
 
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/projects/:projectId/tasks/" element={<TaskListPage />} />
               <Route path="/projects/:projectId/tasks/create" element={<CreateTaskPage />} />
               <Route path="/teams/create" element={<CreateTeamPage />} />
+              <Route path="/accept-invite/:token" element={<AcceptInvitePage />} />
 
               {/* Default Redirect */}
               <Route path="/" element={<Navigate to="/projects" replace />} />

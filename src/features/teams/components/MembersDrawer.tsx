@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, UserMinus, Mail, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, UserMinus, ShieldCheck, Loader2 } from 'lucide-react';
 import { useTeam } from '../../../app/providers/TeamProvider';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { teamsApi } from '../teams.api';
-
-interface Member {
-  id: string;
-  email: string;
-  role: 'admin' | 'member';
-}
+import type { Member } from '../teams.types';
 
 export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { activeTeam } = useTeam();
   const { access, user: currentUser } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [isInviting, setIsInviting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const isAdmin = activeTeam?.role === 'ADMIN';
@@ -28,23 +21,6 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
         .finally(() => setLoading(false));
     }
   }, [isOpen, activeTeam, access]);
-
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inviteEmail || !activeTeam || !access) return;
-    setIsInviting(true);
-    try {
-      await teamsApi.inviteMember(activeTeam.id, inviteEmail, access);
-      setInviteEmail('');
-      // Refresh list
-      const data = await teamsApi.getMembers(activeTeam.id, access);
-      setMembers(data);
-    } catch (err) {
-      alert("Failed to invite user. They may already be in the team.");
-    } finally {
-      setIsInviting(false);
-    }
-  };
 
   const handleRemove = async (userId: string) => {
     if (!window.confirm("Are you sure you want to remove this member?") || !activeTeam || !access) return;
@@ -84,7 +60,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
                       </div>
                     </div>
                     {isAdmin && member.id !== currentUser?.id && (
-                      <button 
+                      <button
                         onClick={() => handleRemove(member.id)}
                         className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                       >
@@ -96,31 +72,6 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
               </div>
             )}
           </div>
-
-          {isAdmin && (
-            <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-              <form onSubmit={handleInvite} className="space-y-3">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="colleague@company.com"
-                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isInviting || !inviteEmail}
-                  className="w-full flex items-center justify-center gap-2 bg-primary text-white py-2.5 rounded-xl text-sm font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
-                >
-                  {isInviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><UserPlus className="w-4 h-4" /> Invite Member</>}
-                </button>
-              </form>
-            </div>
-          )}
         </div>
       </div>
     </>
