@@ -30,10 +30,10 @@ export default function App() {
             {/* AUTHENTICATED ROUTES (Wrapped in Global UX) */}
             <Route element={<AuthLayout />}>
               <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/projects/:projectId" element={<TaskListPage />} />
-              <Route path="/projects/:projectId/tasks/new" element={<CreateTaskPage />} />
+              <Route path="/projects/:projectId/tasks/" element={<TaskListPage />} />
+              <Route path="/projects/:projectId/tasks/create" element={<CreateTaskPage />} />
               <Route path="/teams/create" element={<CreateTeamPage />} />
-              
+
               {/* Default Redirect */}
               <Route path="/" element={<Navigate to="/projects" replace />} />
             </Route>

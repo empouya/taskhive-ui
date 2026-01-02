@@ -53,7 +53,7 @@ export const TaskListPage: React.FC = () => {
         </div>
         <div className="flex gap-2">
           <Link
-            to={`/projects/${projectId}/tasks/new`}
+            to={`/projects/${projectId}/tasks/create`}
             className="flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-all"
           >
             <Plus className="w-4 h-4" /> Create Task
@@ -67,22 +67,22 @@ export const TaskListPage: React.FC = () => {
           <div className="flex flex-col items-center justify-center h-full text-slate-400">
             <p className="text-sm font-medium">No tasks found in this project.</p>
             <Link
-              to={`/projects/${projectId}/tasks/new`}
+              to={`/projects/${projectId}/tasks/create`}
               className="mt-2 text-primary text-xs font-bold hover:underline"
             >
               Create your first task
             </Link>
           </div>
         ) : (
-          tasks.map(task => <TaskRow 
-            key={task.id} 
-            task={task} 
+          tasks.map(task => <TaskRow
+            key={task.id}
+            task={task}
             isSelected={selectedTask?.id === task.id}
-            onUpdate={handleUpdate} 
+            onUpdate={handleUpdate}
             onSelect={handleSelectTask} />)
         )}
       </div>
-      <TaskDetailDrawer 
+      <TaskDetailDrawer
         task={selectedTask}
         isOpen={isDrawerOpen}
         onClose={handleCloseDrawer}

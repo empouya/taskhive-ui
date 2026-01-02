@@ -36,7 +36,7 @@ export const Sidebar: React.FC = () => {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                to={`/projects/${project.id}`}
+                to={`/projects/${project.id}/tasks`}
                 className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${
                   projectId === project.id
                     ? 'bg-primary text-white shadow-lg shadow-primary/20'

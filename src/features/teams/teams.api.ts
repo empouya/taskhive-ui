@@ -14,5 +14,27 @@ export const teamsApi = {
       }
     );
     return data;
+  },
+
+  getMembers: async (teamId: string, access: string) => {
+    const { data } = await axios.get(`${API_BASE}/teams/${teamId}/members/`, {
+      headers: { Authorization: `Bearer ${access}` },
+      withCredentials: true
+    });
+    return data;
+  },
+
+  inviteMember: async (teamId: string, email: string, access: string) => {
+    return await axios.post(`${API_BASE}/teams/${teamId}/invite/`, { email }, {
+      headers: { Authorization: `Bearer ${access}` },
+      withCredentials: true
+    });
+  },
+
+  removeMember: async (teamId: string, userId: string, access: string) => {
+    return await axios.delete(`${API_BASE}/teams/${teamId}/members/${userId}/`, {
+      headers: { Authorization: `Bearer ${access}` },
+      withCredentials: true
+    });
   }
 };
