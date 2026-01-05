@@ -8,7 +8,7 @@ import { teamsApi } from '../teams.api';
 export const AcceptInvitePage: React.FC = () => {
     const { token } = useParams<{ token: string }>();
     const { access } = useAuth();
-    const { fetchTeams } = useTeam();
+    const { refreshTeams } = useTeam();
     const navigate = useNavigate();
 
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -19,7 +19,7 @@ export const AcceptInvitePage: React.FC = () => {
             if (!token || !access) return;
             try {
                 const response = await teamsApi.acceptInvitation(token, access);
-                if (fetchTeams) await fetchTeams();
+                if (refreshTeams) await refreshTeams();
                 setStatus('success');
                 setMessage(response.message);
                 setTimeout(() => navigate('/teams/select'), 2000);

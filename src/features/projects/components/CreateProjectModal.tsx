@@ -7,10 +7,9 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
 }
 
-export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
   const { access } = useAuth();
   const { activeTeam } = useTeam();
   
@@ -29,7 +28,6 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
 
     try {
       await projectsApi.create(activeTeam.id, formData, access);
-      onSuccess();
       onClose();
       setFormData({ name: '', description: '' });
     } catch (err: any) {
