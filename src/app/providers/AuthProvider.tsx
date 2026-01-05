@@ -27,7 +27,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (payload: AuthResponse) => {
     setAccess(payload.access);
     setUser(payload.user);
-    console.log(payload.user)
     localStorage.setItem("user", JSON.stringify(payload.user));
   };
 
@@ -53,23 +52,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setAccess(newAccess);
       return newAccess;
     } catch (err) {
-      setAccess(null);
-      setUser(null);
-      localStorage.removeItem("user");
+      await logout();
       return null;
     }
-  }, []);
+  }, [logout]);
 
   // Startup silent refresh
   useEffect(() => {
+    let isMounted = true;
+    // Only refresh if we have a user (session) but no access token in memory
     const initAuth = async () => {
       if (user && !access) {
         await refreshAccessToken();
       }
-      setIsLoading(false);
+      if (isMounted) {
+        setIsLoading(false);
+      }
     };
     initAuth();
-  }, []);
+
+    return () => { isMounted = false; };
+  }, [user, access, refreshAccessToken]);
 
   return (
     <AuthContext.Provider value={{ user, access, isLoading, login, logout, refreshAccessToken }}>
