@@ -2,7 +2,7 @@ export interface Team {
   id: string;
   name: string;
   description: string;
-  role: 'admin' | 'member';
+  role: 'ADMIN' | 'MEMBER';
 }
 
 export interface TeamContextType {
@@ -15,7 +15,7 @@ export interface TeamContextType {
 export interface Member {
   id: string;
   email: string;
-  role: 'admin' | 'member';
+  role: 'ADMIN' | 'MEMBER';
 }
 
 export interface Invitation {

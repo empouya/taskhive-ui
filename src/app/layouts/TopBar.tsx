@@ -20,6 +20,8 @@ export const TopBar: React.FC = () => {
   return (
     <header className="h-21 flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 z-30">
       {/* CONTEXTUAL PAGE TITLE */}
+
+      {/* TODO: implement {hasUnread && <span ... />} */}
       <h2 className="text-sm font-bold text-slate-900 dark:text-white">
         Dashboard
       </h2>
@@ -49,13 +51,14 @@ export const TopBar: React.FC = () => {
           className="relative cursor-pointer p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
         >
           <Bell className="w-5 h-5" />
+          {/* TODO: implement {hasUnread && <span ... />} */}
           <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
         </button>
 
         <div className="flex items-center gap-3 pl-4 border-l border-slate-100 dark:border-slate-800">
           <div className="text-right hidden sm:block">
             <p className="text-xs font-bold text-slate-900 dark:text-white">{user?.email}</p>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${activeTeam?.role === 'admin' ? 'text-primary' : 'text-slate-400'}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${activeTeam?.role === 'ADMIN' ? 'text-primary' : 'text-slate-400'}`}>
               {displayRole}
             </p>
           </div>
