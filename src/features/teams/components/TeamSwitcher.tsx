@@ -27,7 +27,7 @@ export const TeamSwitcher: React.FC = () => {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="fixed cursor-pointer inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute top-full left-0 w-full mt-2 z-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl py-1 overflow-hidden">
             <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Your Teams
@@ -39,7 +39,7 @@ export const TeamSwitcher: React.FC = () => {
                   setActiveTeam(team);
                   setIsOpen(false);
                 }}
-                className="flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="flex cursor-pointer items-center justify-between w-full px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">

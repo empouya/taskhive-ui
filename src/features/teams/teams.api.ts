@@ -26,11 +26,12 @@ export const teamsApi = {
     return data;
   },
 
-  getMembers: async (teamId: string, access: string): Promise<Member> => {
+  getMembers: async (teamId: string, access: string): Promise<Member[]> => {
     const { data } = await axios.get(`${API_BASE}/teams/${teamId}/members/`, {
       headers: { Authorization: `Bearer ${access}` },
       withCredentials: true
     });
+    console.log(data);
     return data;
   },
 

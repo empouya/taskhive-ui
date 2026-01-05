@@ -39,7 +39,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <h2 className="text-lg font-bold">Team Members</h2>
-            <button onClick={onClose} className="p-2 cursor-pointer hover:bg-slate-100 rounded-full"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><X className="w-5 h-5" /></button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -54,7 +54,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
                       <div className="min-w-0">
                         <p className="text-sm font-semibold truncate dark:text-white">{member.email}</p>
                         <p className="text-[10px] uppercase text-slate-400 font-bold flex items-center gap-1">
-                          {member.role === 'admin' && <ShieldCheck className="w-3 h-3 text-primary" />}
+                          {member.role === 'ADMIN' && <ShieldCheck className="w-3 h-3 text-primary" />}
                           {member.role}
                         </p>
                       </div>
@@ -62,7 +62,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
                     {isAdmin && member.id !== currentUser?.id && (
                       <button
                         onClick={() => handleRemove(member.id)}
-                        className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-2 text-slate-300 cursor-pointer hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                       >
                         <UserMinus className="w-4 h-4" />
                       </button>

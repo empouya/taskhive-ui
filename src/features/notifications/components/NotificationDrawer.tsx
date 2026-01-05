@@ -71,12 +71,12 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={handleMarkAllRead}
-                                className="p-2 text-slate-400 hover:text-primary transition-colors"
+                                className="p-2 text-slate-400 cursor-pointer hover:text-primary transition-colors"
                                 title="Mark all as read"
                             >
                                 <CheckCheck className="w-5 h-5" />
                             </button>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                            <button onClick={onClose} className="p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                                 <X className="w-5 h-5 text-slate-500" />
                             </button>
                         </div>
