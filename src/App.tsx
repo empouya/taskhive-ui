@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './app/providers/AuthProvider';
 import { TeamProvider } from './app/providers/TeamProvider';
-import { AuthLayout } from './app/layouts/AuthLayout';
+import { WorkspaceLayout } from './app/layouts/WorkspaceLayout';
 import useAxiosInterceptors from './hooks/useAxiosInterceptors'
 
 
@@ -17,6 +17,7 @@ import { AcceptInvitePage } from './features/teams/pages/AcceptInvitePage';
 import { RootRedirector } from './features/auth/pages/RootRedirector';
 import { ProtectedRoute } from './app/providers/ProtectedRoute';
 import { TeamGuard } from './app/providers/TeamGuard';
+import { ProjectProvider } from './app/providers/ProjectProvider';
 
 export default function App() {
 
@@ -32,35 +33,29 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
 
             {/* SEMI-PROTECTED (Needs Login, but doesn't need a Team yet) */}
-            <Route
-              path="/teams/select"
-              element={<ProtectedRoute><TeamSelectionPage /></ProtectedRoute>} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/teams/select" element={<TeamSelectionPage />} />
 
-            <Route
-              path="/teams/create"
-              element={<ProtectedRoute><CreateTeamPage /></ProtectedRoute>} />
+              <Route path="/teams/create" element={<CreateTeamPage />} />
 
-            <Route
-              path="/accept-invite/:token"
-              element={<ProtectedRoute><AcceptInvitePage /></ProtectedRoute>} />
+              <Route path="/accept-invite/:token" element={<AcceptInvitePage />} />
 
-            {/* FULLY PROTECTED ROUTES (Needs Login AND a Team) */}
-            <Route element={<AuthLayout />}>
-              <Route
-                path="/projects"
-                element={<ProtectedRoute><TeamGuard><ProjectsPage /></TeamGuard></ProtectedRoute>} />
+              {/* FULLY PROTECTED ROUTES (Needs Login AND a Team) */}
+              <Route element={<TeamGuard />}>
+                <Route element={<ProjectProvider />}>
+                  <Route element={<WorkspaceLayout />}>
+                    <Route path="/projects" element={<ProjectsPage />} />
 
-              <Route
-                path="/projects/:projectId/tasks/"
-                element={<ProtectedRoute><TeamGuard><TaskListPage /></TeamGuard></ProtectedRoute>} />
+                    <Route path="/projects/:projectId/tasks/" element={<TaskListPage />} />
 
-              <Route
-                path="/projects/:projectId/tasks/create"
-                element={<ProtectedRoute><TeamGuard><CreateTaskPage /></TeamGuard></ProtectedRoute>} />
-
-              {/* DEFAULT REDIRECT */}
-              <Route path="/" element={<RootRedirector />} />
+                    <Route path="/projects/:projectId/tasks/create" element={<CreateTaskPage />} />
+                  </Route>
+                </Route>
+              </Route>
             </Route>
+
+            {/* DEFAULT REDIRECT */}
+            <Route path="/" element={<RootRedirector />} />
           </Routes>
         </TeamProvider>
       </AuthProvider>
