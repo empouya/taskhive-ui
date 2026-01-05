@@ -5,18 +5,17 @@ import { Users, ChevronRight, Loader2 } from 'lucide-react';
 import type { Team } from '../teams.types';
 
 export const TeamSelectionPage: React.FC = () => {
-  const { teams, setActiveTeam, isLoading } = useTeam();
+  const { teams, activeTeam, setActiveTeam, isLoading } = useTeam();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && teams.length === 1) {
-      handleSelect(teams[0]);
+    if (!isLoading && activeTeam) {
+      navigate('/projects');
     }
-  }, [teams, isLoading]);
+  }, [activeTeam, isLoading, navigate]);
 
   const handleSelect = (team: any) => {
     setActiveTeam(team);
-    navigate('/projects');
   };
 
   if (isLoading) {
@@ -26,6 +25,8 @@ export const TeamSelectionPage: React.FC = () => {
       </div>
     );
   }
+
+  if (activeTeam) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
@@ -59,8 +60,9 @@ export const TeamSelectionPage: React.FC = () => {
           ))}
         </div>
 
-        <button 
+        <button
           onClick={() => navigate('/teams/create')}
+          disabled={isLoading}
           className="w-full cursor-pointer py-3 text-sm font-semibold text-slate-500 hover:text-primary transition-colors border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl"
         >
           + Create a new team

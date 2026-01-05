@@ -6,13 +6,23 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 export const teamsApi = {
   create: async (name: string, description: string, access: string): Promise<Team> => {
     const { data } = await axios.post(
-      `${API_BASE}/teams/`, 
-      { name, description }, 
+      `${API_BASE}/teams/`,
+      { name, description },
       {
         headers: { Authorization: `Bearer ${access}` },
         withCredentials: true
       }
     );
+    return data;
+  },
+
+  getTeams: async (access: string) => {
+    const { data } = await axios.get(
+      `${API_BASE}/teams/`,
+      {
+        headers: { Authorization: `Bearer ${access}` },
+        withCredentials: true
+      });
     return data;
   },
 
@@ -27,9 +37,9 @@ export const teamsApi = {
   removeMember: async (teamId: string, userId: string, access: string) => {
     return await axios.delete(`${API_BASE}/teams/${teamId}/members/${userId}`,
       {
-      headers: { Authorization: `Bearer ${access}` },
-      withCredentials: true
-    });
+        headers: { Authorization: `Bearer ${access}` },
+        withCredentials: true
+      });
   },
 
   listInvitations: async (teamId: string, access: string): Promise<Invitation[]> => {
@@ -41,7 +51,7 @@ export const teamsApi = {
   },
 
   createInvitation: async (teamId: string, email: string, access: string): Promise<Invitation> => {
-    const { data } = await axios.post(`${API_BASE}/teams/${teamId}/invites/`, 
+    const { data } = await axios.post(`${API_BASE}/teams/${teamId}/invites/`,
       { email },
       { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
     );
@@ -56,10 +66,10 @@ export const teamsApi = {
   },
 
   acceptInvitation: async (token: string, access: string) => {
-  const { data } = await axios.post(`${API_BASE}/invites/${token}/accept/`, 
-    {},
-    { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
-  );
-  return data;
-},
+    const { data } = await axios.post(`${API_BASE}/invites/${token}/accept/`,
+      {},
+      { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
+    );
+    return data;
+  },
 };
