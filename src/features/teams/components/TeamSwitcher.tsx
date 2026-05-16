@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTeam } from '../../../app/providers/TeamProvider';
 
 export const TeamSwitcher: React.FC = () => {
   const { teams, activeTeam, setActiveTeam } = useTeam();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!activeTeam) return null;
@@ -11,7 +13,7 @@ export const TeamSwitcher: React.FC = () => {
   return (
     <div className="relative w-full">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center justify-between w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 cursor-pointer"
       >
         <div className="flex items-center gap-3 overflow-hidden">
@@ -32,6 +34,7 @@ export const TeamSwitcher: React.FC = () => {
             <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Your Teams
             </div>
+
             {teams.map((team) => (
               <button
                 key={team.id}
@@ -52,6 +55,18 @@ export const TeamSwitcher: React.FC = () => {
                 {activeTeam.id === team.id && <Check className="w-4 h-4 text-primary" />}
               </button>
             ))}
+
+            {teams.length > 1 && (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate('/teams/select');
+                }}
+                className="w-full text-left px-3 py-2 text-sm text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-t border-slate-100 dark:border-slate-800"
+              >
+                Switch from full list
+              </button>
+            )}
           </div>
         </>
       )}

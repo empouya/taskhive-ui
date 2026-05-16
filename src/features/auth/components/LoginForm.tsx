@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 import { authApi } from '../auth.api';
 import { useAuth } from '../../../app/providers/AuthProvider';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getErrorMessage } from '../../../lib/apiError';
+
+type LoginLocationState = {
+  from?: {
+    pathname: string;
+    search?: string;
+    hash?: string;
+  };
+};
 
 export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,8 +25,13 @@ export const LoginForm: React.FC = () => {
     password: '',
   });
 
+  const redirectTarget =
+    (location.state as LoginLocationState | null)?.from?.pathname
+      ? `${(location.state as LoginLocationState).from!.pathname}${(location.state as LoginLocationState).from?.search ?? ''}${(location.state as LoginLocationState).from?.hash ?? ''}`
+      : '/';
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,10 +41,8 @@ export const LoginForm: React.FC = () => {
 
     try {
       const response = await authApi.login(formData);
-
       login(response);
-
-      navigate('/');
+      navigate(redirectTarget, { replace: true });
     } catch (error: unknown) {
       setError(getErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
@@ -100,7 +112,9 @@ export const LoginForm: React.FC = () => {
 
         <p className="text-center text-sm text-slate-500 mt-4">
           Don't have an account?{' '}
-          <button onClick={() => navigate('/register')} className="text-primary font-medium hover:underline">Register</button>
+          <button type="button" onClick={() => navigate('/register')} className="text-primary font-medium hover:underline">
+            Register
+          </button>
         </p>
       </form>
     </div>

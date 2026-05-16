@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Users, Loader2, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../app/providers/AuthProvider';
 import { useTeam } from '../../../app/providers/TeamProvider';
+import { getErrorMessage } from '../../../lib/apiError';
 import { teamsApi } from '../teams.api';
 
 export const CreateTeamForm: React.FC = () => {
-  const { access } = useAuth();
   const { setActiveTeam } = useTeam();
   const navigate = useNavigate();
-  
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,20 +16,16 @@ export const CreateTeamForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!access) {
-      alert("You are not logged in yet");
-      return;
-    }
-    
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const newTeam = await teamsApi.create(name, description);
+      const newTeam = await teamsApi.create(name.trim(), description.trim());
       setActiveTeam(newTeam);
-      navigate('/projects');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to create team. Name might be taken.');
+      navigate('/projects', { replace: true });
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to create team. Name might already be taken.'));
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +56,7 @@ export const CreateTeamForm: React.FC = () => {
 
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-             Description <span className="text-[10px] text-slate-400 font-normal">(Optional)</span>
+            Description <span className="text-[10px] text-slate-400 font-normal">(Optional)</span>
           </label>
           <div className="relative">
             <textarea

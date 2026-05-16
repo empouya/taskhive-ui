@@ -27,8 +27,13 @@ import type { Notification } from '../features/notifications/notifications.types
 
 const toNumberId = (value: ApiId | string): number => Number(value);
 
-const normalizeRole = (role: ApiRole): 'ADMIN' | 'MEMBER' =>
-    role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'MEMBER';
+const normalizeRole = (role: ApiRole | null | undefined): 'ADMIN' | 'MEMBER' => {
+    if (typeof role !== 'string') {
+        return 'MEMBER';
+    }
+
+    return role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'MEMBER';
+};
 
 export const normalizeUser = (user: ApiUserDto): User => ({
     id: toNumberId(user.id),

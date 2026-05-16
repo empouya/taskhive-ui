@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader2, ShieldCheck, UserMinus, X } from 'lucide-react';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { useTeam } from '../../../app/providers/TeamProvider';
+import { getErrorMessage } from '../../../lib/apiError';
 import { teamsApi } from '../teams.api';
 import type { Member } from '../teams.types';
 
@@ -9,9 +10,10 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
   const { activeTeam } = useTeam();
   const { user: currentUser } = useAuth();
   const [members, setMembers] = useState<Member[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const isAdmin = activeTeam?.role === 'ADMIN';
-  const isLoading = isOpen && members === null;
+  const isLoading = isOpen && members === null && !error;
 
   useEffect(() => {
     if (!isOpen || !activeTeam) {
@@ -21,14 +23,18 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
     let isCancelled = false;
 
     const loadMembers = async () => {
+      setMembers(null);
+      setError(null);
+
       try {
         const data = await teamsApi.getMembers(activeTeam.id);
         if (!isCancelled) {
           setMembers(data);
         }
-      } catch {
+      } catch (error: unknown) {
         if (!isCancelled) {
           setMembers([]);
+          setError(getErrorMessage(error, 'Failed to load team members.'));
         }
       }
     };
@@ -37,7 +43,6 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
 
     return () => {
       isCancelled = true;
-      setMembers(null);
     };
   }, [isOpen, activeTeam]);
 
@@ -49,8 +54,8 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
     try {
       await teamsApi.removeMember(activeTeam.id, userId);
       setMembers((prev) => (prev ? prev.filter((member) => member.id !== userId) : prev));
-    } catch {
-      alert('Could not remove member.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Could not remove member.'));
     }
   };
 
@@ -61,10 +66,18 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <h2 className="text-lg font-bold">Team Members</h2>
-            <button onClick={onClose} className="p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><X className="w-5 h-5" /></button>
+            <button onClick={onClose} className="p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {error && (
+              <div className="p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
+                {error}
+              </div>
+            )}
+
             {isLoading ? (
               <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
             ) : (
@@ -93,6 +106,10 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
                     )}
                   </div>
                 ))}
+
+                {!error && (members ?? []).length === 0 && (
+                  <p className="text-sm text-slate-400 italic text-center py-8">No members found.</p>
+                )}
               </div>
             )}
           </div>

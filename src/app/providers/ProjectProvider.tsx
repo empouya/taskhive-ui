@@ -20,13 +20,14 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 export const ProjectProvider = () => {
     const { access } = useAuth();
     const { activeTeam } = useTeam();
+    const activeTeamId = activeTeam?.id ?? null;
 
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchProjects = useCallback(async () => {
-        if (!access || !activeTeam) {
+        if (!access || activeTeamId === null) {
             setProjects([]);
             return;
         }
@@ -34,30 +35,25 @@ export const ProjectProvider = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const data = await projectsApi.list(activeTeam.id);
+            const data = await projectsApi.list(activeTeamId);
             setProjects(data);
         } catch (error: unknown) {
             setError(getErrorMessage(error, 'Failed to load projects'));
         } finally {
             setIsLoading(false);
         }
-    }, [access, activeTeam]);
+    }, [access, activeTeamId]);
 
     // 2. Create logic - Automatically updates the local list (Optimistic UI sync)
     const createProject = useCallback(async (payload: CreateProjectPayload) => {
-        if (!access || !activeTeam) throw new Error('Not authenticated or no team selected');
-
-        try {
-            const newProject = await projectsApi.create(activeTeam.id, payload);
-            // Append new project to list so UI updates instantly
-            setProjects(prev => [newProject, ...prev]);
-            return newProject;
-        } catch (error: unknown) {
-            throw error;
-            // TODO: must be implemented using new error handler:
-            // setError(getErrorMessage(error, 'Failed to create the project'));
+        if (!access || activeTeamId === null) {
+            throw new Error('Not authenticated or no team selected');
         }
-    }, [access, activeTeam]);
+
+        const newProject = await projectsApi.create(activeTeamId, payload);
+        setProjects((prev) => [newProject, ...prev]);
+        return newProject;
+    }, [access, activeTeamId]);
 
     // 3. Archive logic - Locally filters out the archived project
     const archiveProject = useCallback(async (projectId: number) => {

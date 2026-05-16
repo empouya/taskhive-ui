@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Team } from '../../features/teams/teams.types';
-import { useAuth } from './AuthProvider';
 import { teamsApi } from '../../features/teams/teams.api';
+import { useAuth } from './AuthProvider';
 
 interface TeamContextType {
   teams: Team[];
@@ -15,6 +15,17 @@ interface TeamContextType {
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
 
+const areTeamsEqual = (left: Team | null, right: Team | null) => {
+  if (!left || !right) return left === right;
+
+  return (
+    left.id === right.id &&
+    left.name === right.name &&
+    left.description === right.description &&
+    left.role === right.role
+  );
+};
+
 export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { access, isLoading: authLoading } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
@@ -22,66 +33,98 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [activeTeam, setActiveTeamState] = useState<Team | null>(() => {
     try {
       const saved = localStorage.getItem('activeTeam');
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
+      return saved ? (JSON.parse(saved) as Team) : null;
+    } catch {
+      return null;
+    }
   });
 
+  const clearActiveTeam = useCallback(() => {
+    setActiveTeamState((prev) => {
+      if (prev !== null) {
+        localStorage.removeItem('activeTeam');
+      }
+      return null;
+    });
+  }, []);
+
+  const handleSetActiveTeam = useCallback((team: Team) => {
+    setActiveTeamState((prev) => {
+      if (areTeamsEqual(prev, team)) {
+        return prev;
+      }
+
+      localStorage.setItem('activeTeam', JSON.stringify(team));
+      return team;
+    });
+  }, []);
+
+  const activeTeamId = activeTeam?.id ?? null;
+
   const fetchTeams = useCallback(async () => {
-    if (authLoading) return;
+    if (authLoading) {
+      return;
+    }
+
     if (!access) {
       setTeams([]);
-      setActiveTeamState(null);
+      clearActiveTeam();
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    try {
-      const data = await teamsApi.getTeams();
-      setTeams(data);
 
-      if (activeTeam) {
-        const exists = data.find((t: Team) => t.id === activeTeam.id);
-        if (!exists) {
-          setActiveTeamState(null);
-          localStorage.removeItem('activeTeam');
-        }
-      } else if (data.length === 1) {
-        const firstTeam = data[0];
-        setActiveTeamState(firstTeam);
-        localStorage.setItem('activeTeam', JSON.stringify(firstTeam));
+    try {
+      const nextTeams = await teamsApi.getTeams();
+      setTeams(nextTeams);
+
+      if (nextTeams.length === 0) {
+        clearActiveTeam();
+        return;
       }
-    } catch (err) {
-      console.error("Failed to fetch teams", err);
+
+      if (activeTeamId !== null) {
+        const matchingTeam = nextTeams.find((team) => team.id === activeTeamId);
+
+        if (matchingTeam) {
+          handleSetActiveTeam(matchingTeam);
+          return;
+        }
+      }
+
+      if (nextTeams.length === 1) {
+        handleSetActiveTeam(nextTeams[0]);
+        return;
+      }
+
+      clearActiveTeam();
+    } catch (error) {
+      console.error('Failed to fetch teams', error);
     } finally {
       setIsLoading(false);
     }
-  }, [access, authLoading, activeTeam]);
+  }, [access, activeTeamId, authLoading, clearActiveTeam, handleSetActiveTeam]);
 
-
-  // Fetch teams when authenticated
   useEffect(() => {
-    fetchTeams();
+    void fetchTeams();
   }, [fetchTeams]);
 
-  const handleSetActiveTeam = (team: Team) => {
-    setActiveTeamState(team);
-    localStorage.setItem('activeTeam', JSON.stringify(team));
-  };
-
   const requiresSelection = useMemo(() => {
-    return (teams.length > 1 || teams.length == 0) && !activeTeam;
+    return teams.length > 1 && !activeTeam;
   }, [teams, activeTeam]);
 
   return (
-    <TeamContext.Provider value={{
-      teams,
-      activeTeam,
-      setActiveTeam: handleSetActiveTeam,
-      isLoading,
-      requiresSelection,
-      refreshTeams: fetchTeams
-    }}>
+    <TeamContext.Provider
+      value={{
+        teams,
+        activeTeam,
+        setActiveTeam: handleSetActiveTeam,
+        isLoading,
+        requiresSelection,
+        refreshTeams: fetchTeams,
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );
