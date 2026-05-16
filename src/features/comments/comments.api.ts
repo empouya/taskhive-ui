@@ -1,26 +1,15 @@
-import axios from 'axios';
 import type { Comment } from '../tasks/tasks.types';
+import { apiClient } from '../../lib/apiClient';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 export const commentsApi = {
-  create: async (taskId: string, content: string, access: string): Promise<Comment> => {
-    const { data } = await axios.post(
-      `${API_BASE}/tasks/${taskId}/comments/`,
-      { content },
-      { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
-    );
+  create: async (taskId: string, content: string): Promise<Comment> => {
+    const { data } = await apiClient.post(`/tasks/${taskId}/comments/`, { content });
     return data;
   },
-  
-  list: async (taskId: string, access: string): Promise<Comment[]> => {
-    const { data } = await axios.get(
-      `${API_BASE}/tasks/${taskId}/comments/`,
-      { 
-        headers: { Authorization: `Bearer ${access}` }, 
-        withCredentials: true 
-      }
-    );
-    return data; // This should be the array of comments
+
+  list: async (taskId: string): Promise<Comment[]> => {
+    const { data } = await apiClient.get(`/tasks/${taskId}/comments/`);
+    return data;
   },
 };

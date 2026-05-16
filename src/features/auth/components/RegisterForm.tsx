@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, Mail, Lock, Loader2 } from 'lucide-react';
 import { authApi } from '../auth.api';
+import { getErrorMessage } from '../../../lib/apiError';
 
 export const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ export const RegisterForm: React.FC = () => {
       console.log('Registration successful:');
       alert('Account created successfully!');
       navigate('/login');
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
       setIsLoading(false);
     }

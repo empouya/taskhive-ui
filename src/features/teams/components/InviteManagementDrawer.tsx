@@ -19,9 +19,10 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
     if (!activeTeam || !access) return;
     setIsLoading(true);
     try {
-      const data = await teamsApi.listInvitations(activeTeam.id, access);
+      const data = await teamsApi.listInvitations(activeTeam.id);
       setInvites(data);
     } catch (err) {
+      console.log(err);
       console.error("Failed to load invitations");
     } finally {
       setIsLoading(false);
@@ -38,10 +39,11 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
 
     setIsSubmitting(true);
     try {
-      const newInvite = await teamsApi.createInvitation(activeTeam.id, email, access);
+      const newInvite = await teamsApi.createInvitation(activeTeam.id, email);
       setInvites(prev => [newInvite, ...prev]);
       setEmail('');
     } catch (err) {
+      console.log(err);
       alert("Failed to create invitation. Email might already be invited.");
     } finally {
       setIsSubmitting(false);
@@ -51,9 +53,10 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
   const handleDelete = async (inviteId: string) => {
     if (!activeTeam || !access) return;
     try {
-      await teamsApi.deleteInvitation(activeTeam.id, inviteId, access);
+      await teamsApi.deleteInvitation(activeTeam.id, inviteId);
       setInvites(prev => prev.filter(i => i.id !== inviteId));
     } catch (err) {
+      console.log(err);
       alert("Failed to delete invitation");
     }
   };

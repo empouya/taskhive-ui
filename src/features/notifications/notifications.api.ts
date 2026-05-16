@@ -1,6 +1,5 @@
-import axios from 'axios';
+import { apiClient } from '../../lib/apiClient';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 export interface Notification {
     id: string;
@@ -12,25 +11,16 @@ export interface Notification {
 }
 
 export const notificationsApi = {
-    list: async (access: string): Promise<Notification[]> => {
-        const { data } = await axios.get(`${API_BASE}/notifications/`, {
-            headers: { Authorization: `Bearer ${access}` },
-            withCredentials: true
-        });
+    list: async (): Promise<Notification[]> => {
+        const { data } = await apiClient.get('/notifications/');
         return data;
     },
 
-    markAsRead: async (notificationId: string, access: string): Promise<void> => {
-        await axios.patch(`${API_BASE}/notifications/${notificationId}/read/`,
-            { unread: false },
-            { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
-        );
+    markAsRead: async (notificationId: string): Promise<void> => {
+        await apiClient.patch(`/notifications/${notificationId}/read/`, { unread: false });
     },
 
-    markAllAsRead: async (access: string): Promise<void> => {
-        await axios.post(`${API_BASE}/notifications/mark-all-read/`,
-            {},
-            { headers: { Authorization: `Bearer ${access}` }, withCredentials: true }
-        );
-    }
+    markAllAsRead: async (): Promise<void> => {
+        await apiClient.post('/notifications/mark-all-read/', {});
+    },
 };

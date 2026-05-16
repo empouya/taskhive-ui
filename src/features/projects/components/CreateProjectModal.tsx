@@ -12,7 +12,7 @@ interface CreateProjectModalProps {
 export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
   const { access } = useAuth();
   const { activeTeam } = useTeam();
-  
+
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
     setError(null);
 
     try {
-      await projectsApi.create(activeTeam.id, formData, access);
+      await projectsApi.create(activeTeam.id, formData);
       onClose();
       setFormData({ name: '', description: '' });
     } catch (err: any) {
@@ -40,9 +40,9 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Glass Backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" 
-        onClick={onClose} 
+      <div
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
       />
 
       {/* Modal Card */}

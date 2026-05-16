@@ -1,34 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { X, UserMinus, ShieldCheck, Loader2 } from 'lucide-react';
-import { useTeam } from '../../../app/providers/TeamProvider';
+import React, { useEffect, useState } from 'react';
+import { Loader2, ShieldCheck, UserMinus, X } from 'lucide-react';
 import { useAuth } from '../../../app/providers/AuthProvider';
+import { useTeam } from '../../../app/providers/TeamProvider';
 import { teamsApi } from '../teams.api';
 import type { Member } from '../teams.types';
 
 export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { activeTeam } = useTeam();
-  const { access, user: currentUser } = useAuth();
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuth();
+  const [members, setMembers] = useState<Member[] | null>(null);
 
   const isAdmin = activeTeam?.role === 'ADMIN';
+  const isLoading = isOpen && members === null;
 
   useEffect(() => {
-    if (isOpen && activeTeam && access) {
-      setLoading(true);
-      teamsApi.getMembers(activeTeam.id, access)
-        .then(setMembers)
-        .finally(() => setLoading(false));
+    if (!isOpen || !activeTeam) {
+      return;
     }
-  }, [isOpen, activeTeam, access]);
+
+    let isCancelled = false;
+
+    const loadMembers = async () => {
+      try {
+        const data = await teamsApi.getMembers(activeTeam.id);
+        if (!isCancelled) {
+          setMembers(data);
+        }
+      } catch {
+        if (!isCancelled) {
+          setMembers([]);
+        }
+      }
+    };
+
+    void loadMembers();
+
+    return () => {
+      isCancelled = true;
+      setMembers(null);
+    };
+  }, [isOpen, activeTeam]);
 
   const handleRemove = async (userId: string) => {
-    if (!window.confirm("Are you sure you want to remove this member?") || !activeTeam || !access) return;
+    if (!window.confirm('Are you sure you want to remove this member?') || !activeTeam) {
+      return;
+    }
+
     try {
-      await teamsApi.removeMember(activeTeam.id, userId, access);
-      setMembers(prev => prev.filter(m => m.id !== userId));
-    } catch (err) {
-      alert("Could not remove member.");
+      await teamsApi.removeMember(activeTeam.id, userId);
+      setMembers((prev) => (prev ? prev.filter((member) => member.id !== userId) : prev));
+    } catch {
+      alert('Could not remove member.');
     }
   };
 
@@ -43,9 +65,11 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" /> : (
+            {isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+            ) : (
               <div className="space-y-4">
-                {members.map(member => (
+                {(members ?? []).map((member) => (
                   <div key={member.id} className="flex items-center justify-between group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold uppercase">

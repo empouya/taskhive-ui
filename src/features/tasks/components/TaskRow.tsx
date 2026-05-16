@@ -1,11 +1,11 @@
 import React from 'react';
 import { Circle, CheckCircle2, Clock, AlertCircle, ChevronRight } from 'lucide-react';
-import type { Task, TaskPriority } from '../tasks.types';
+import type { Task, TaskPriority, UpdateTaskPayload } from '../tasks.types';
 
 interface TaskRowProps {
   task: Task;
   isSelected?: boolean;
-  onUpdate: (id: string, payload: any) => void;
+  onUpdate: (id: string, payload: UpdateTaskPayload) => void;
   onSelect: (task: Task) => void;
 }
 

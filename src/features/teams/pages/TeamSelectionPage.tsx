@@ -14,7 +14,7 @@ export const TeamSelectionPage: React.FC = () => {
     }
   }, [activeTeam, isLoading, navigate]);
 
-  const handleSelect = (team: any) => {
+  const handleSelect = (team: Team) => {
     setActiveTeam(team);
   };
 

@@ -37,7 +37,7 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     setIsLoading(true);
     try {
-      const data = await teamsApi.getTeams(access);
+      const data = await teamsApi.getTeams();
       setTeams(data);
 
       if (activeTeam) {
@@ -62,7 +62,7 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Fetch teams when authenticated
   useEffect(() => {
     fetchTeams();
-  }, [access, authLoading]);
+  }, [fetchTeams]);
 
   const handleSetActiveTeam = (team: Team) => {
     setActiveTeamState(team);

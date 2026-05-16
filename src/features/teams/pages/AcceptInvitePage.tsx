@@ -18,7 +18,7 @@ export const AcceptInvitePage: React.FC = () => {
         const accept = async () => {
             if (!token || !access) return;
             try {
-                const response = await teamsApi.acceptInvitation(token, access);
+                const response = await teamsApi.acceptInvitation(token);
                 if (refreshTeams) await refreshTeams();
                 setStatus('success');
                 setMessage(response.message);
@@ -31,7 +31,7 @@ export const AcceptInvitePage: React.FC = () => {
         };
 
         accept();
-    }, [token, access, navigate]);
+    }, [token, access, navigate, refreshTeams]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">

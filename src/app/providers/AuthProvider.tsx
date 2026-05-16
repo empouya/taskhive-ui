@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import type { ReactNode } from 'react';
 import type { User, AuthResponse } from '../../features/auth/auth.types';
 import { authApi } from '../../features/auth/auth.api';
+import { registerApiAuth } from '../../lib/apiClient';
 
 interface AuthContextType {
   user: User | null;
@@ -53,9 +54,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return newAccess;
     } catch (err) {
       await logout();
+      console.log(err);
       return null;
     }
   }, [logout]);
+
+  useEffect(() => {
+    registerApiAuth({
+      getAccessToken: () => access,
+      refreshAccessToken,
+      logout,
+    });
+  }, [access, refreshAccessToken, logout]);
 
   // Startup silent refresh
   useEffect(() => {

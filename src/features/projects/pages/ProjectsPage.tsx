@@ -17,6 +17,7 @@ export const ProjectsPage: React.FC = () => {
         try {
             await archiveProject(id);
         } catch (err) {
+            console.log(err);
             alert("Failed to archive project.");
         }
     };

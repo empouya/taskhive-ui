@@ -26,7 +26,7 @@ export const CreateTeamForm: React.FC = () => {
     setError(null);
 
     try {
-      const newTeam = await teamsApi.create(name, description, access);
+      const newTeam = await teamsApi.create(name, description);
       setActiveTeam(newTeam);
       navigate('/projects');
     } catch (err: any) {

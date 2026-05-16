@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { tasksApi } from '../tasks.api';
-import type { Task } from '../tasks.types';
+import type { Task, UpdateTaskPayload } from '../tasks.types';
 import { TaskRow } from '../components/TaskRow';
 import { ListFilter, Search, Plus } from 'lucide-react';
 import { TaskDetailDrawer } from '../components/TaskDetailDrawer';
@@ -17,19 +17,19 @@ export const TaskListPage: React.FC = () => {
 
   useEffect(() => {
     if (projectId && access) {
-      tasksApi.listByProject(projectId, access).then(setTasks).finally(() => setLoading(false));
+      tasksApi.listByProject(projectId).then(setTasks).finally(() => setLoading(false));
     }
   }, [projectId, access]);
 
-  const handleUpdate = async (taskId: string, payload: any) => {
+  const handleUpdate = async (taskId: string, payload: UpdateTaskPayload) => {
     if (!access) return;
     // Optimistic Update
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...payload } : t));
     try {
-      await tasksApi.update(taskId, payload, access);
+      await tasksApi.update(taskId, payload);
     } catch (err) {
       console.log(err)
-      const original = await tasksApi.listByProject(projectId!, access);
+      const original = await tasksApi.listByProject(projectId!);
       setTasks(original);
     }
   };

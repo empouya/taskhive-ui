@@ -33,7 +33,7 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
     setError(null);
 
     try {
-      await tasksApi.create(projectId, formData, access);
+      await tasksApi.create(projectId, formData);
       onSuccess();
     } catch (err: any) {
         console.log(err);

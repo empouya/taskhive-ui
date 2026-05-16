@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthProvider';
 import { useTeam } from './TeamProvider';
 import type { Project, CreateProjectPayload } from '../../features/projects/projects.types';
 import { projectsApi } from '../../features/projects/projects.apis';
 import { Outlet } from 'react-router-dom';
+import { getErrorMessage } from '../../lib/apiError';
 
 interface ProjectContextType {
     projects: Project[];
@@ -33,10 +34,10 @@ export const ProjectProvider = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const data = await projectsApi.list(activeTeam.id, access);
+            const data = await projectsApi.list(activeTeam.id);
             setProjects(data);
-        } catch (err: any) {
-            setError(err.message || 'Failed to load projects');
+        } catch (error: unknown) {
+            setError(getErrorMessage(error, 'Failed to load projects'));
         } finally {
             setIsLoading(false);
         }
@@ -47,12 +48,14 @@ export const ProjectProvider = () => {
         if (!access || !activeTeam) throw new Error('Not authenticated or no team selected');
 
         try {
-            const newProject = await projectsApi.create(activeTeam.id, payload, access);
+            const newProject = await projectsApi.create(activeTeam.id, payload);
             // Append new project to list so UI updates instantly
             setProjects(prev => [newProject, ...prev]);
             return newProject;
-        } catch (err: any) {
-            throw err;
+        } catch (error: unknown) {
+            throw error;
+            // TODO: must be implemented using new error handler:
+            // setError(getErrorMessage(error, 'Failed to create the project'));
         }
     }, [access, activeTeam]);
 
@@ -61,11 +64,11 @@ export const ProjectProvider = () => {
         if (!access) return;
 
         try {
-            await projectsApi.archive(projectId, access);
+            await projectsApi.archive(projectId);
             // Remove or update the project in the local state
             setProjects(prev => prev.filter(p => p.id !== projectId));
-        } catch (err: any) {
-            throw err;
+        } catch (error: unknown) {
+            setError(getErrorMessage(error, 'Failed to archive the project'));
         }
     }, [access]);
 

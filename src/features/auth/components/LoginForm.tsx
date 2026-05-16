@@ -3,6 +3,7 @@ import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
 import { authApi } from '../auth.api';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '../../../lib/apiError';
 
 export const LoginForm: React.FC = () => {
   const { login } = useAuth();
@@ -30,8 +31,8 @@ export const LoginForm: React.FC = () => {
       login(response);
 
       navigate('/teams/select');
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
       setIsLoading(false);
     }

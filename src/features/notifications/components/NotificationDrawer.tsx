@@ -13,7 +13,7 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
         if (!access) return;
         setLoading(true);
         try {
-            const data = await notificationsApi.list(access);
+            const data = await notificationsApi.list();
             setNotifications(data);
         } catch (err) {
             console.log(err)
@@ -30,9 +30,10 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
     const handleMarkRead = async (id: string) => {
         if (!access) return;
         try {
-            await notificationsApi.markAsRead(id, access);
+            await notificationsApi.markAsRead(id);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
         } catch (err) {
+            console.log(err);
             console.error("Failed to mark as read");
         }
     };
@@ -41,9 +42,10 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
     const handleMarkAllRead = async () => {
         if (!access || notifications.every(n => !n.unread)) return;
         try {
-            await notificationsApi.markAllAsRead(access);
+            await notificationsApi.markAllAsRead();
             setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
         } catch (err) {
+            console.log(err);
             console.error("Failed to mark all as read");
         }
     };

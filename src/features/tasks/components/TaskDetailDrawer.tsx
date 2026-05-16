@@ -19,11 +19,11 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({ task, isOpen
   useEffect(() => {
     if (task && access) {
       setComments([]);
-      commentsApi.list(task.id, access)
+      commentsApi.list(task.id)
         .then(setComments)
         .catch(() => console.error("Could not load comments"));
     }
-  }, [task?.id, access]);
+  }, [task, access]);
 
   if (!task) return null;
 
@@ -33,10 +33,11 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({ task, isOpen
 
     setIsSubmitting(true);
     try {
-      const comment = await commentsApi.create(task.id, newComment, access);
+      const comment = await commentsApi.create(task.id, newComment);
       setComments(prev => [...prev, comment]);
       setNewComment('');
     } catch (err) {
+      console.log(err);
       console.error("Failed to post comment");
     } finally {
       setIsSubmitting(false);
