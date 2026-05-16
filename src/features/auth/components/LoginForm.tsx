@@ -30,7 +30,7 @@ export const LoginForm: React.FC = () => {
 
       login(response);
 
-      navigate('/teams/select');
+      navigate('/');
     } catch (error: unknown) {
       setError(getErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
@@ -68,7 +68,7 @@ export const LoginForm: React.FC = () => {
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="text-sm font-medium leading-none text-slate-700 dark:text-slate-300">Password</label>
-            <button type="button" className="text-xs text-primary hover:underline">Forgot password?</button>
+            <span className="text-xs text-slate-400">Password reset not available yet</span>
           </div>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />

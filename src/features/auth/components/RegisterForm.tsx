@@ -35,11 +35,10 @@ export const RegisterForm: React.FC = () => {
 
     try {
       await authApi.register(formData);
-      console.log('Registration successful:');
       alert('Account created successfully!');
       navigate('/login');
     } catch (error: unknown) {
-      setError(getErrorMessage(error, 'Login failed. Please check your credentials.'));
+      setError(getErrorMessage(error, 'Registration failed. Please check your details.'));
     } finally {
       setIsLoading(false);
     }
