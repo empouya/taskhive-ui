@@ -5,7 +5,7 @@ import type { Task, TaskPriority, UpdateTaskPayload } from '../tasks.types';
 interface TaskRowProps {
   task: Task;
   isSelected?: boolean;
-  onUpdate: (id: string, payload: UpdateTaskPayload) => void;
+  onUpdate: (id: number, payload: UpdateTaskPayload) => void;
   onSelect: (task: Task) => void;
 }
 

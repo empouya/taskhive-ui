@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ListTodo, AlignLeft, Flag, User, Layers, Loader2, CheckCircle } from 'lucide-react';
-import type { TaskStatus, TaskPriority } from '../tasks.types';
+import type { CreateTaskInput, TaskStatus, TaskPriority } from '../tasks.types';
 import { tasksApi } from '../tasks.api';
 import { useAuth } from '../../../app/providers/AuthProvider';
 
@@ -16,7 +16,7 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateTaskInput>({
     title: '',
     description: '',
     status: 'TODO' as TaskStatus,

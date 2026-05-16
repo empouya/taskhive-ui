@@ -1,19 +1,23 @@
-import type { Project, CreateProjectPayload } from './projects.types';
 import { apiClient } from '../../lib/apiClient';
-
+import type { ApiProjectDto } from '../../lib/contracts';
+import { normalizeProject } from '../../lib/normalizers';
+import type { CreateProjectPayload, Project } from './projects.types';
 
 export const projectsApi = {
-  list: async (teamId: string): Promise<Project[]> => {
-    const { data } = await apiClient.get(`/teams/${teamId}/projects/`);
-    return data;
+  list: async (teamId: number | string): Promise<Project[]> => {
+    const { data } = await apiClient.get<ApiProjectDto[]>(`/teams/${teamId}/projects/`);
+    return data.map(normalizeProject);
   },
 
-  create: async (teamId: string, payload: CreateProjectPayload): Promise<Project> => {
-    const { data } = await apiClient.post(`/teams/${teamId}/projects/`, payload);
-    return data;
+  create: async (
+    teamId: number | string,
+    payload: CreateProjectPayload,
+  ): Promise<Project> => {
+    const { data } = await apiClient.post<ApiProjectDto>(`/teams/${teamId}/projects/`, payload);
+    return normalizeProject(data);
   },
 
-  archive: async (projectId: string): Promise<void> => {
+  archive: async (projectId: number | string): Promise<void> => {
     await apiClient.post(`/projects/${projectId}/archive/`, {});
   },
 };

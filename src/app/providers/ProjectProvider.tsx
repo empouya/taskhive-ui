@@ -12,7 +12,7 @@ interface ProjectContextType {
     error: string | null;
     refreshProjects: () => Promise<void>;
     createProject: (payload: CreateProjectPayload) => Promise<Project>;
-    archiveProject: (projectId: string) => Promise<void>;
+    archiveProject: (projectId: number) => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -60,7 +60,7 @@ export const ProjectProvider = () => {
     }, [access, activeTeam]);
 
     // 3. Archive logic - Locally filters out the archived project
-    const archiveProject = useCallback(async (projectId: string) => {
+    const archiveProject = useCallback(async (projectId: number) => {
         if (!access) return;
 
         try {

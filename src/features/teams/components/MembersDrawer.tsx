@@ -41,7 +41,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
     };
   }, [isOpen, activeTeam]);
 
-  const handleRemove = async (userId: string) => {
+  const handleRemove = async (userId: number) => {
     if (!window.confirm('Are you sure you want to remove this member?') || !activeTeam) {
       return;
     }

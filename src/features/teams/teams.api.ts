@@ -1,43 +1,63 @@
-import type { Team, Invitation, Member } from './teams.types';
 import { apiClient } from '../../lib/apiClient';
-
+import type {
+  ApiInvitationDto,
+  ApiMemberDto,
+  ApiTeamDto,
+} from '../../lib/contracts';
+import {
+  normalizeInvitation,
+  normalizeMember,
+  normalizeTeam,
+} from '../../lib/normalizers';
+import type { Invitation, Member, Team } from './teams.types';
 
 export const teamsApi = {
   create: async (name: string, description: string): Promise<Team> => {
-    const { data } = await apiClient.post('/teams/', { name, description });
-    return data;
+    const { data } = await apiClient.post<ApiTeamDto>('/teams/', { name, description });
+    return normalizeTeam(data);
   },
 
-  getTeams: async () => {
-    const { data } = await apiClient.get('/teams/');
-    return data;
+  getTeams: async (): Promise<Team[]> => {
+    const { data } = await apiClient.get<ApiTeamDto[]>('/teams/');
+    return data.map(normalizeTeam);
   },
 
-  getMembers: async (teamId: string): Promise<Member[]> => {
-    const { data } = await apiClient.get(`/teams/${teamId}/members/`);
-    return data;
+  getMembers: async (teamId: number | string): Promise<Member[]> => {
+    const { data } = await apiClient.get<ApiMemberDto[]>(`/teams/${teamId}/members/`);
+    return data.map(normalizeMember);
   },
 
-  removeMember: async (teamId: string, userId: string) => {
+  removeMember: async (teamId: number | string, userId: number | string) => {
     await apiClient.delete(`/teams/${teamId}/members/${userId}`);
   },
 
-  listInvitations: async (teamId: string): Promise<Invitation[]> => {
-    const { data } = await apiClient.get(`/teams/${teamId}/invites/`);
-    return data;
+  listInvitations: async (teamId: number | string): Promise<Invitation[]> => {
+    const { data } = await apiClient.get<ApiInvitationDto[]>(`/teams/${teamId}/invites/`);
+    return data.map(normalizeInvitation);
   },
 
-  createInvitation: async (teamId: string, email: string): Promise<Invitation> => {
-    const { data } = await apiClient.post(`/teams/${teamId}/invites/`, { email });
-    return data;
+  createInvitation: async (
+    teamId: number | string,
+    email: string,
+  ): Promise<Invitation> => {
+    const { data } = await apiClient.post<ApiInvitationDto>(`/teams/${teamId}/invites/`, {
+      email,
+    });
+    return normalizeInvitation(data);
   },
 
-  deleteInvitation: async (teamId: string, inviteId: string): Promise<void> => {
+  deleteInvitation: async (teamId: number | string, inviteId: number | string): Promise<void> => {
     await apiClient.delete(`/teams/${teamId}/invites/${inviteId}/`);
   },
 
   acceptInvitation: async (token: string): Promise<{ message: string }> => {
-    const { data } = await apiClient.post(`/invites/${token}/accept/`, {});
-    return data;
+    const { data } = await apiClient.post<{ message?: string; detail?: string }>(
+      `/invites/${token}/accept/`,
+      {},
+    );
+
+    return {
+      message: data.message ?? data.detail ?? 'Invitation accepted successfully.',
+    };
   },
 };

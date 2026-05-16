@@ -1,9 +1,9 @@
 export interface Project {
-  id: string;
+  id: number;
   name: string;
   description: string;
   is_archived: boolean;
-  team_id: string;
+  team_id: number;
   created_at: string;
 }
 

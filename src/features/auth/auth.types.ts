@@ -1,17 +1,17 @@
 export interface User {
-  id: string;
+  id: number;
   email: string;
 }
 
 export interface RegisterCredentials {
   email: string;
-  password?: string;
-  password_confirm?: string;
+  password: string;
+  password_confirm: string;
 }
 
 export interface AuthResponse {
   access: string;
-  user: User
+  user: User;
 }
 
 export interface AuthError {
@@ -21,5 +21,5 @@ export interface AuthError {
 
 export interface LoginCredentials {
   email: string;
-  password?: string;
+  password: string;
 }

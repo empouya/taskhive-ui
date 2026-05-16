@@ -6,7 +6,7 @@ import type { Project } from '../projects.types';
 interface ProjectCardProps {
   project: Project;
   isAdmin: boolean;
-  onArchive: (id: string) => void;
+  onArchive: (id: number) => void;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, isAdmin, onArchive }) => {

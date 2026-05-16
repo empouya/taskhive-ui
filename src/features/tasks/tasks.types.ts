@@ -2,26 +2,38 @@ export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export interface Task {
-  id: string;
-  project_id: string;
+  id: number;
+  project_id: number;
   title: string;
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
   due_date: string | null;
-  order: number;
+  position: number;
+  assignee_id: number | null;
+}
+
+export interface CreateTaskInput {
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee: string;
+  position: number;
 }
 
 export interface UpdateTaskPayload {
   status?: TaskStatus;
   priority?: TaskPriority;
   title?: string;
+  description?: string;
+  due_date?: string | null;
 }
 
 export interface Comment {
-  id: string;
+  id: number;
   author: {
-    id: string;
+    id: number;
     email: string;
   };
   content: string;

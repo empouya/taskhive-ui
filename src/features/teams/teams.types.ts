@@ -1,5 +1,5 @@
 export interface Team {
-  id: string;
+  id: number;
   name: string;
   description: string;
   role: 'ADMIN' | 'MEMBER';
@@ -13,13 +13,13 @@ export interface TeamContextType {
 }
 
 export interface Member {
-  id: string;
+  id: number;
   email: string;
   role: 'ADMIN' | 'MEMBER';
 }
 
 export interface Invitation {
-  id: string;
+  id: number;
   email: string;
   token: string;
   created_at: string;

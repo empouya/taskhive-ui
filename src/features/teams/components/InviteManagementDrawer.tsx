@@ -13,7 +13,7 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const fetchInvites = useCallback(async () => {
     if (!activeTeam || !access) return;
@@ -50,7 +50,7 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
     }
   };
 
-  const handleDelete = async (inviteId: string) => {
+  const handleDelete = async (inviteId: number) => {
     if (!activeTeam || !access) return;
     try {
       await teamsApi.deleteInvitation(activeTeam.id, inviteId);

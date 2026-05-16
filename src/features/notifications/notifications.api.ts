@@ -1,26 +1,25 @@
 import { apiClient } from '../../lib/apiClient';
-
-
-export interface Notification {
-    id: string;
-    actor_email: string;
-    verb: string;
-    target_task_title: string;
-    unread: boolean;
-    created_at: string;
-}
+import type { ApiNotificationDto } from '../../lib/contracts';
+import { normalizeNotification } from '../../lib/normalizers';
+import type { Notification } from './notifications.types';
 
 export const notificationsApi = {
     list: async (): Promise<Notification[]> => {
-        const { data } = await apiClient.get('/notifications/');
-        return data;
+        const { data } = await apiClient.get<ApiNotificationDto[]>('/notifications/');
+        return data.map(normalizeNotification);
     },
 
-    markAsRead: async (notificationId: string): Promise<void> => {
+    markAsRead: async (notificationId: number | string): Promise<void> => {
         await apiClient.patch(`/notifications/${notificationId}/read/`, { unread: false });
     },
 
-    markAllAsRead: async (): Promise<void> => {
-        await apiClient.post('/notifications/mark-all-read/', {});
+    markAllAsRead: async (notifications: Notification[]): Promise<void> => {
+        const unreadNotifications = notifications.filter((notification) => notification.unread);
+
+        await Promise.all(
+            unreadNotifications.map((notification) =>
+                apiClient.patch(`/notifications/${notification.id}/read/`, { unread: false }),
+            ),
+        );
     },
 };

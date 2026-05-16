@@ -1,7 +1,8 @@
-import type { RegisterCredentials, AuthResponse, LoginCredentials } from './auth.types';
+import type { AuthResponse, LoginCredentials, RegisterCredentials, User } from './auth.types';
 import { apiClient } from '../../lib/apiClient';
+import type { ApiAuthResponseDto, ApiUserDto } from '../../lib/contracts';
 import { getErrorMessage } from '../../lib/apiError';
-
+import { normalizeAuthResponse, normalizeUser } from '../../lib/normalizers';
 
 export const authApi = {
   register: async (credentials: RegisterCredentials): Promise<void> => {
@@ -14,10 +15,19 @@ export const authApi = {
 
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      const { data } = await apiClient.post<AuthResponse>('/auth/login/', credentials);
-      return data;
+      const { data } = await apiClient.post<ApiAuthResponseDto>('/auth/login/', credentials);
+      return normalizeAuthResponse(data);
     } catch (error) {
       throw new Error(getErrorMessage(error, 'Login failed.'));
+    }
+  },
+
+  me: async (): Promise<User> => {
+    try {
+      const { data } = await apiClient.get<ApiUserDto>('/auth/me/');
+      return normalizeUser(data);
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Failed to load current user.'));
     }
   },
 
@@ -36,5 +46,5 @@ export const authApi = {
     } catch (error) {
       throw new Error(getErrorMessage(error, 'Token refresh failed.'));
     }
-  }
+  },
 };

@@ -21,7 +21,7 @@ export const TaskListPage: React.FC = () => {
     }
   }, [projectId, access]);
 
-  const handleUpdate = async (taskId: string, payload: UpdateTaskPayload) => {
+  const handleUpdate = async (taskId: number, payload: UpdateTaskPayload) => {
     if (!access) return;
     // Optimistic Update
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...payload } : t));

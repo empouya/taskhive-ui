@@ -1,23 +1,19 @@
 import axios from 'axios';
+import type { ApiErrorPayload } from './contracts';
 
 export const getErrorMessage = (
     error: unknown,
     fallback = 'An unexpected error occurred.',
 ) => {
     if (axios.isAxiosError(error)) {
-        const detail =
-            error.response?.data &&
-                typeof error.response.data === 'object' &&
-                'detail' in error.response.data
-                ? error.response.data.detail
-                : null;
+        const payload = error.response?.data as ApiErrorPayload | undefined;
 
-        if (typeof detail === 'string' && detail.trim()) {
-            return detail;
-        }
+        const candidates = [payload?.detail, payload?.message, payload?.error, error.message];
 
-        if (typeof error.message === 'string' && error.message.trim()) {
-            return error.message;
+        for (const candidate of candidates) {
+            if (typeof candidate === 'string' && candidate.trim()) {
+                return candidate;
+            }
         }
     }
 

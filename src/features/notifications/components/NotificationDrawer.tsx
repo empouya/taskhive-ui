@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, BellOff, Check, Circle, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '../../../app/providers/AuthProvider';
 import { notificationsApi } from '../notifications.api';
-import type { Notification } from '../notifications.api';
+import type { Notification } from '../notifications.types';
 
 export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const { access } = useAuth();
@@ -27,7 +27,7 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
         if (isOpen) fetchNotifications();
     }, [isOpen, fetchNotifications]);
 
-    const handleMarkRead = async (id: string) => {
+    const handleMarkRead = async (id: number) => {
         if (!access) return;
         try {
             await notificationsApi.markAsRead(id);
@@ -42,7 +42,7 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
     const handleMarkAllRead = async () => {
         if (!access || notifications.every(n => !n.unread)) return;
         try {
-            await notificationsApi.markAllAsRead();
+            await notificationsApi.markAllAsRead(notifications);
             setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
         } catch (err) {
             console.log(err);

@@ -12,7 +12,7 @@ export const ProjectsPage: React.FC = () => {
 
     const isAdmin = activeTeam?.role === 'ADMIN';
 
-    const handleArchive = async (id: string) => {
+    const handleArchive = async (id: number) => {
         if (!window.confirm("Archive this project? It will become read-only.")) return;
         try {
             await archiveProject(id);

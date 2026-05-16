@@ -7,6 +7,7 @@ import { useProjects } from '../providers/ProjectProvider';
 export const Sidebar: React.FC = () => {
   const { projects, isLoading } = useProjects();
   const { projectId } = useParams();
+  const activeProjectId = projectId ? Number(projectId) : null;
 
   const activeProjects = projects.filter(p => !p.is_archived);
   const archivedProjects = projects.filter(p => p.is_archived);
@@ -37,16 +38,16 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={project.id}
                   to={`/projects/${project.id}/tasks`}
-                  className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${projectId === project.id
+                  className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${activeProjectId === project.id
                     ? 'bg-primary text-white shadow-lg shadow-primary/20'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Folder className={`w-4 h-4 ${projectId === project.id ? 'text-white' : 'text-slate-400'}`} />
+                    <Folder className={`w-4 h-4 ${activeProjectId === project.id ? 'text-white' : 'text-slate-400'}`} />
                     <span className="truncate w-32">{project.name}</span>
                   </div>
-                  <ChevronRight className={`w-3 h-3 ${projectId === project.id ? 'opacity-100' : 'opacity-0'}`} />
+                  <ChevronRight className={`w-3 h-3 ${activeProjectId === project.id ? 'opacity-100' : 'opacity-0'}`} />
                 </Link>
               ))
             )}
@@ -78,16 +79,16 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={project.id}
                   to={`/projects/${project.id}/tasks`}
-                  className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${projectId === project.id
+                  className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${activeProjectId === project.id
                     ? 'bg-primary text-white shadow-lg shadow-primary/20'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Folder className={`w-4 h-4 ${projectId === project.id ? 'text-white' : 'text-slate-400'}`} />
+                    <Folder className={`w-4 h-4 ${activeProjectId === project.id ? 'text-white' : 'text-slate-400'}`} />
                     <span className="truncate w-32">{project.name}</span>
                   </div>
-                  <ChevronRight className={`w-3 h-3 ${projectId === project.id ? 'opacity-100' : 'opacity-0'}`} />
+                  <ChevronRight className={`w-3 h-3 ${activeProjectId === project.id ? 'opacity-100' : 'opacity-0'}`} />
                 </Link>
               ))
             )}
