@@ -1,37 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Layout, AlignLeft, Loader2 } from 'lucide-react';
-import { projectsApi } from '../projects.apis';
-import { useAuth } from '../../../app/providers/AuthProvider';
-import { useTeam } from '../../../app/providers/TeamProvider';
+import { useProjects } from '../../../app/providers/ProjectProvider';
+import { getErrorMessage } from '../../../lib/apiError';
+import type { ProjectFormValues } from '../projects.types';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
-  const { access } = useAuth();
-  const { activeTeam } = useTeam();
+const initialForm: ProjectFormValues = {
+  name: '',
+  description: '',
+};
 
-  const [formData, setFormData] = useState({ name: '', description: '' });
+export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose }) => {
+  const { createProject } = useProjects();
+
+  const [formData, setFormData] = useState<ProjectFormValues>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData(initialForm);
+      setError(null);
+      setIsLoading(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!access || !activeTeam) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
-      await projectsApi.create(activeTeam.id, formData);
+      await createProject({
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+      });
       onClose();
-      setFormData({ name: '', description: '' });
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to create project. Check your permissions.');
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'Failed to create project. Check your permissions.'));
     } finally {
       setIsLoading(false);
     }
@@ -39,17 +52,19 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Glass Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Card */}
       <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">New Project</h2>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+          >
             <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
@@ -65,7 +80,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
               className="w-full h-12 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
               placeholder="e.g. Q4 Product Roadmap"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
             />
           </div>
 
@@ -77,7 +92,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, 
               className="w-full h-32 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none resize-none"
               placeholder="What is this project about?"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
             />
           </div>
 

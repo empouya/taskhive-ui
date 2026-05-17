@@ -1,41 +1,51 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Archive, Folder, Lock, ArrowRight } from 'lucide-react';
+import { Archive, Folder, Lock, RotateCcw, ArrowRight } from 'lucide-react';
 import type { Project } from '../projects.types';
 
 interface ProjectCardProps {
   project: Project;
   isAdmin: boolean;
   onArchive: (id: number) => void;
+  onRestore: (id: number) => void;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, isAdmin, onArchive }) => {
+export const ProjectCard: React.FC<ProjectCardProps> = ({
+  project,
+  isAdmin,
+  onArchive,
+  onRestore,
+}) => {
   const isArchived = project.is_archived;
 
   return (
-    <div className={`group relative p-6 rounded-2xl border transition-all ${isArchived
-      ? 'bg-slate-50/50 border-slate-200 grayscale opacity-75'
-      : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 shadow-sm'
-      }`}>
+    <div
+      className={`group relative p-6 rounded-2xl border transition-all ${isArchived
+          ? 'bg-slate-50/50 border-slate-200 opacity-85'
+          : 'bg-white border-slate-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 shadow-sm'
+        }`}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className={`p-2 rounded-lg ${isArchived ? 'bg-slate-200' : 'bg-primary/10'}`}>
           <Folder className={`w-5 h-5 ${isArchived ? 'text-slate-500' : 'text-primary'}`} />
         </div>
 
-        {isAdmin && !isArchived && (
+        {isAdmin && (
           <button
-            onClick={() => onArchive(project.id)}
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            title="Archive Project"
+            type="button"
+            onClick={() => (isArchived ? onRestore(project.id) : onArchive(project.id))}
+            className="p-2 text-slate-400 hover:text-primary hover:bg-slate-100 rounded-lg transition-colors"
+            title={isArchived ? 'Restore Project' : 'Archive Project'}
           >
-            <Archive className="w-4 h-4" />
+            {isArchived ? <RotateCcw className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
           </button>
         )}
       </div>
 
-      <h3 className={`text-lg font-bold mb-1 ${isArchived ? 'text-slate-500 italic' : 'text-slate-900'}`}>
+      <h3 className={`text-lg font-bold mb-1 ${isArchived ? 'text-slate-600 italic' : 'text-slate-900'}`}>
         {project.name}
       </h3>
+
       <p className="text-sm text-slate-500 line-clamp-2 mb-6">
         {project.description || 'No description provided.'}
       </p>

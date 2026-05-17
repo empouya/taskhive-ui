@@ -7,7 +7,9 @@ export interface Project {
   created_at: string;
 }
 
-export interface CreateProjectPayload {
+export interface ProjectFormValues {
   name: string;
-  description?: string;
+  description: string;
 }
+
+export type CreateProjectPayload = ProjectFormValues;

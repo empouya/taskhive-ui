@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Outlet } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { useTeam } from './TeamProvider';
-import type { Project, CreateProjectPayload } from '../../features/projects/projects.types';
+import type { CreateProjectPayload, Project } from '../../features/projects/projects.types';
 import { projectsApi } from '../../features/projects/projects.apis';
-import { Outlet } from 'react-router-dom';
 import { getErrorMessage } from '../../lib/apiError';
 
 interface ProjectContextType {
@@ -13,6 +13,7 @@ interface ProjectContextType {
     refreshProjects: () => Promise<void>;
     createProject: (payload: CreateProjectPayload) => Promise<Project>;
     archiveProject: (projectId: number) => Promise<void>;
+    restoreProject: (projectId: number) => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -29,22 +30,23 @@ export const ProjectProvider = () => {
     const fetchProjects = useCallback(async () => {
         if (!access || activeTeamId === null) {
             setProjects([]);
+            setError(null);
             return;
         }
 
         setIsLoading(true);
         setError(null);
+
         try {
             const data = await projectsApi.list(activeTeamId);
             setProjects(data);
         } catch (error: unknown) {
-            setError(getErrorMessage(error, 'Failed to load projects'));
+            setError(getErrorMessage(error, 'Failed to load projects.'));
         } finally {
             setIsLoading(false);
         }
     }, [access, activeTeamId]);
 
-    // 2. Create logic - Automatically updates the local list (Optimistic UI sync)
     const createProject = useCallback(async (payload: CreateProjectPayload) => {
         if (!access || activeTeamId === null) {
             throw new Error('Not authenticated or no team selected');
@@ -55,22 +57,44 @@ export const ProjectProvider = () => {
         return newProject;
     }, [access, activeTeamId]);
 
-    // 3. Archive logic - Locally filters out the archived project
     const archiveProject = useCallback(async (projectId: number) => {
-        if (!access) return;
+        if (!access) {
+            return;
+        }
 
         try {
             await projectsApi.archive(projectId);
-            // Remove or update the project in the local state
-            setProjects(prev => prev.filter(p => p.id !== projectId));
+            setProjects((prev) =>
+                prev.map((project) =>
+                    project.id === projectId ? { ...project, is_archived: true } : project,
+                ),
+            );
         } catch (error: unknown) {
-            setError(getErrorMessage(error, 'Failed to archive the project'));
+            setError(getErrorMessage(error, 'Failed to archive the project.'));
+            throw error;
         }
     }, [access]);
 
-    // Trigger fetch whenever the active team changes
+    const restoreProject = useCallback(async (projectId: number) => {
+        if (!access) {
+            return;
+        }
+
+        try {
+            await projectsApi.restore(projectId);
+            setProjects((prev) =>
+                prev.map((project) =>
+                    project.id === projectId ? { ...project, is_archived: false } : project,
+                ),
+            );
+        } catch (error: unknown) {
+            setError(getErrorMessage(error, 'Failed to restore the project.'));
+            throw error;
+        }
+    }, [access]);
+
     useEffect(() => {
-        fetchProjects();
+        void fetchProjects();
     }, [fetchProjects]);
 
     return (
@@ -81,7 +105,8 @@ export const ProjectProvider = () => {
                 error,
                 refreshProjects: fetchProjects,
                 createProject,
-                archiveProject
+                archiveProject,
+                restoreProject,
             }}
         >
             <Outlet />
@@ -91,6 +116,8 @@ export const ProjectProvider = () => {
 
 export const useProjects = () => {
     const context = useContext(ProjectContext);
-    if (!context) throw new Error('useProjects must be used within a ProjectProvider');
+    if (!context) {
+        throw new Error('useProjects must be used within a ProjectProvider');
+    }
     return context;
 };

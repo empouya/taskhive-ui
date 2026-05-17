@@ -3,6 +3,7 @@ import { ListTodo, AlignLeft, Flag, User, Layers, Loader2, CheckCircle } from 'l
 import type { CreateTaskInput, TaskStatus, TaskPriority } from '../tasks.types';
 import { tasksApi } from '../tasks.api';
 import { useAuth } from '../../../app/providers/AuthProvider';
+import { getErrorMessage } from '../../../lib/apiError';
 
 interface CreateTaskFormProps {
   projectId: string;
@@ -35,9 +36,9 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
     try {
       await tasksApi.create(projectId, formData);
       onSuccess();
-    } catch (err: any) {
-        console.log(err);
-      setError(err.response?.data?.detail || 'Failed to create task.');
+    } catch (err: unknown) {
+      console.log(err);
+      setError(getErrorMessage(err || 'Failed to create task.'));
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +58,7 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           />
         </div>
-        
+
         <div className="flex items-start gap-2 text-slate-400 focus-within:text-primary">
           <AlignLeft className="w-5 h-5 mt-1" />
           <textarea
@@ -77,10 +78,10 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
           <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
             <CheckCircle className="w-3 h-3" /> Status
           </label>
-          <select 
+          <select
             className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-primary/20"
             value={formData.status}
-            onChange={(e) => setFormData({...formData, status: e.target.value as TaskStatus})}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as TaskStatus })}
           >
             <option value="TODO">Todo</option>
             <option value="IN_PROGRESS">In Progress</option>
@@ -92,10 +93,10 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
           <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
             <Flag className="w-3 h-3" /> Priority
           </label>
-          <select 
+          <select
             className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm appearance-none focus:ring-2 focus:ring-primary/20"
             value={formData.priority}
-            onChange={(e) => setFormData({...formData, priority: e.target.value as TaskPriority})}
+            onChange={(e) => setFormData({ ...formData, priority: e.target.value as TaskPriority })}
           >
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
@@ -107,11 +108,11 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
           <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
             <User className="w-3 h-3" /> Assignee
           </label>
-          <input 
+          <input
             className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
             placeholder="Search team members..."
             value={formData.assignee}
-            onChange={(e) => setFormData({...formData, assignee: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
           />
         </div>
 
@@ -119,11 +120,11 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
           <label className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
             <Layers className="w-3 h-3" /> Position
           </label>
-          <input 
+          <input
             type="number"
             className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
             value={formData.position}
-            onChange={(e) => setFormData({...formData, position: parseInt(e.target.value)})}
+            onChange={(e) => setFormData({ ...formData, position: parseInt(e.target.value) })}
           />
         </div>
       </div>
@@ -131,15 +132,15 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ projectId, nextP
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       <div className="flex justify-end gap-3 pt-4">
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={onCancel}
           className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
         >
           Cancel
         </button>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isLoading || !formData.title}
           className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 disabled:opacity-50 shadow-lg shadow-primary/20 flex items-center gap-2"
         >

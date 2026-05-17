@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
 import { useTeam } from '../../../app/providers/TeamProvider';
-import { ProjectCard } from '../components/ProjectCard';
-import { Plus, Loader2, FolderPlus } from 'lucide-react';
-import { CreateProjectModal } from '../components/CreateProjectModal';
 import { useProjects } from '../../../app/providers/ProjectProvider';
+import { ProjectCard } from '../components/ProjectCard';
+import { Plus, Loader2, FolderPlus, ArchiveRestore } from 'lucide-react';
+import { CreateProjectModal } from '../components/CreateProjectModal';
 
 export const ProjectsPage: React.FC = () => {
-    const { projects, archiveProject, isLoading } = useProjects();
+    const { projects, archiveProject, restoreProject, isLoading, error } = useProjects();
     const { activeTeam } = useTeam();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isAdmin = activeTeam?.role === 'ADMIN';
+    const activeProjects = projects.filter((project) => !project.is_archived);
+    const archivedProjects = projects.filter((project) => project.is_archived);
 
     const handleArchive = async (id: number) => {
-        if (!window.confirm("Archive this project? It will become read-only.")) return;
+        if (!window.confirm('Archive this project? It will become read-only.')) return;
+
         try {
             await archiveProject(id);
-        } catch (err) {
-            console.log(err);
-            alert("Failed to archive project.");
+        } catch {
+            alert('Failed to archive project.');
         }
     };
 
-    const activeProjects = projects.filter(p => !p.is_archived);
+    const handleRestore = async (id: number) => {
+        try {
+            await restoreProject(id);
+        } catch {
+            alert('Failed to restore project.');
+        }
+    };
 
     if (isLoading && projects.length === 0) {
         return (
@@ -33,8 +41,8 @@ export const ProjectsPage: React.FC = () => {
     }
 
     return (
-        <div className="p-8 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-8 max-w-7xl mx-auto space-y-10">
+            <div className="flex justify-between items-center gap-4">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-4">
                         <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
@@ -59,7 +67,7 @@ export const ProjectsPage: React.FC = () => {
                                 </span>
                                 <span className="text-slate-300 dark:text-slate-700">|</span>
                                 <span className="text-sm italic">
-                                    {activeTeam?.description || "Collaborative workspace for your team tasks."}
+                                    {activeTeam?.description || 'Collaborative workspace for your team tasks.'}
                                 </span>
                             </div>
                         </div>
@@ -68,6 +76,7 @@ export const ProjectsPage: React.FC = () => {
 
                 {isAdmin && (
                     <button
+                        type="button"
                         onClick={() => setIsModalOpen(true)}
                         className="flex cursor-pointer items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
                     >
@@ -76,43 +85,91 @@ export const ProjectsPage: React.FC = () => {
                 )}
             </div>
 
-            {activeProjects.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-                    <div className="p-4 bg-white dark:bg-slate-800 rounded-full shadow-sm mb-4">
-                        <FolderPlus className="w-8 h-8 text-slate-400" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">No active projects</h3>
-                    <p className="text-slate-500 mb-6 text-center max-w-xs">
-                        {isAdmin
-                            ? "Get started by creating your first project for the team."
-                            : "Your team doesn't have any active projects yet."}
-                    </p>
-                    {isAdmin && (
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="text-primary font-semibold hover:underline cursor-pointer"
-                        >
-                            Create a project now
-                        </button>
-                    )}
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {activeProjects.map(project => (
-                        <ProjectCard
-                            key={project.id}
-                            project={project}
-                            isAdmin={isAdmin}
-                            onArchive={handleArchive}
-                        />
-                    ))}
+            {error && (
+                <div className="p-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-2xl dark:bg-red-900/10 dark:border-red-900/20 dark:text-red-300">
+                    {error}
                 </div>
             )}
 
-            <CreateProjectModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
+            <section className="space-y-5">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Projects</h2>
+                    {activeProjects.length > 0 && (
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            {activeProjects.length} total
+                        </span>
+                    )}
+                </div>
+
+                {activeProjects.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                        <div className="p-4 bg-white dark:bg-slate-800 rounded-full shadow-sm mb-4">
+                            <FolderPlus className="w-8 h-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">No active projects</h3>
+                        <p className="text-slate-500 mb-6 text-center max-w-xs">
+                            {isAdmin
+                                ? 'Get started by creating your first project for the team.'
+                                : "Your team doesn't have any active projects yet."}
+                        </p>
+                        {isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setIsModalOpen(true)}
+                                className="text-primary font-semibold hover:underline cursor-pointer"
+                            >
+                                Create a project now
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {activeProjects.map((project) => (
+                            <ProjectCard
+                                key={project.id}
+                                project={project}
+                                isAdmin={isAdmin}
+                                onArchive={handleArchive}
+                                onRestore={handleRestore}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            <section className="space-y-5">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <ArchiveRestore className="w-5 h-5 text-slate-400" />
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Archived Projects</h2>
+                    </div>
+                    {archivedProjects.length > 0 && (
+                        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            {archivedProjects.length} total
+                        </span>
+                    )}
+                </div>
+
+                {archivedProjects.length === 0 ? (
+                    <div className="p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 text-center text-sm text-slate-400 italic">
+                        No archived projects yet.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {archivedProjects.map((project) => (
+                            <ProjectCard
+                                key={project.id}
+                                project={project}
+                                isAdmin={isAdmin}
+                                onArchive={handleArchive}
+                                onRestore={handleRestore}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            <CreateProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
 };
