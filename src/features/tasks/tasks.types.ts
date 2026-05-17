@@ -18,7 +18,7 @@ export interface CreateTaskInput {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assignee: string;
+  assignee_id: number | null;
   position: number;
 }
 

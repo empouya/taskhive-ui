@@ -1,8 +1,5 @@
 import { apiClient } from '../../lib/apiClient';
-import type {
-  ApiCommentDto,
-  ApiTaskDto,
-} from '../../lib/contracts';
+import type { ApiCommentDto, ApiTaskDto } from '../../lib/contracts';
 import {
   normalizeComment,
   normalizeTask,
@@ -10,12 +7,7 @@ import {
   toCreateTaskRequest,
   toUpdateTaskRequest,
 } from '../../lib/normalizers';
-import type {
-  Comment,
-  CreateTaskInput,
-  Task,
-  UpdateTaskPayload,
-} from './tasks.types';
+import type { Comment, CreateTaskInput, Task, UpdateTaskPayload } from './tasks.types';
 
 export const tasksApi = {
   listByProject: async (projectId: number | string): Promise<Task[]> => {
@@ -23,10 +15,7 @@ export const tasksApi = {
     return data.map(normalizeTask);
   },
 
-  update: async (
-    taskId: number | string,
-    payload: UpdateTaskPayload,
-  ): Promise<Task> => {
+  update: async (taskId: number | string, payload: UpdateTaskPayload): Promise<Task> => {
     const { data } = await apiClient.patch<ApiTaskDto>(
       `/tasks/${taskId}/`,
       toUpdateTaskRequest(payload),
