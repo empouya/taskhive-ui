@@ -14,10 +14,8 @@ export const notificationsApi = {
     },
 
     markAllAsRead: async (notifications: Notification[]): Promise<void> => {
-        const unreadNotifications = notifications.filter((notification) => notification.unread);
-
         await Promise.all(
-            unreadNotifications.map((notification) =>
+            notifications.map((notification) =>
                 apiClient.patch(`/notifications/${notification.id}/read/`, { unread: false }),
             ),
         );

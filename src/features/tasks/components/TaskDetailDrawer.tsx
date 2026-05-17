@@ -7,6 +7,7 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 import { teamsApi } from '../../teams/teams.api';
 import type { Member } from '../../teams/teams.types';
 import { getErrorMessage } from '../../../lib/apiError';
+import { useNotifications } from '../../../app/providers/NotificationProvider';
 
 interface TaskDetailDrawerProps {
   task: Task | null;
@@ -45,6 +46,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
 }) => {
   const { access } = useAuth();
   const { activeTeam } = useTeam();
+  const { refreshNotifications } = useNotifications();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -74,14 +76,16 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
     let isCancelled = false;
 
     const loadComments = async () => {
+      setCommentError(null);
       try {
         const data = await commentsApi.list(task.id);
         if (!isCancelled) {
           setComments(data);
         }
-      } catch {
+      } catch (error: unknown) {
         if (!isCancelled) {
           setComments([]);
+          setCommentError(getErrorMessage(error, 'Failed to load comments.'));
         }
       }
     };
@@ -214,6 +218,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
       const comment = await commentsApi.create(task.id, newComment);
       setComments((prev) => [...prev, comment]);
       setNewComment('');
+      await refreshNotifications();
     } catch (error: unknown) {
       setCommentError(getErrorMessage(error, 'Failed to post comment.'));
     } finally {
