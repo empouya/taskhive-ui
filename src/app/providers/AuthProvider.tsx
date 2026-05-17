@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { AuthResponse, User } from '../../features/auth/auth.types';
 import { authApi } from '../../features/auth/auth.api';
+import type { AuthResponse, User } from '../../features/auth/auth.types';
 import { registerApiAuth } from '../../lib/apiClient';
 
 interface AuthContextType {
@@ -78,18 +78,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let isMounted = true;
 
     const bootstrapSession = async () => {
+      if (!user) {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         const newAccess = await authApi.refresh();
-        if (!isMounted) return;
+
+        if (!isMounted) {
+          return;
+        }
 
         setAccess(newAccess);
-
-        const currentUser = await authApi.me();
-        if (!isMounted) return;
-
-        persistUser(currentUser);
       } catch {
-        if (!isMounted) return;
+        if (!isMounted) {
+          return;
+        }
+
         clearSession();
       } finally {
         if (isMounted) {
@@ -103,7 +111,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => {
       isMounted = false;
     };
-  }, [clearSession, persistUser]);
+  }, [user, clearSession]);
 
   return (
     <AuthContext.Provider value={{ user, access, isLoading, login, logout, refreshAccessToken }}>
