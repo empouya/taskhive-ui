@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, BellOff, Check, Circle, CheckCheck, Loader2 } from 'lucide-react';
 import { useNotifications } from '../../../app/providers/NotificationProvider';
+import { InlineNotice } from '../../../components/ui/InlineNotice';
 
 export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const {
@@ -105,9 +106,7 @@ export const NotificationDrawer: React.FC<{ isOpen: boolean; onClose: () => void
                             </div>
                         ) : error ? (
                             <div className="p-6">
-                                <div className="p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
-                                    {error}
-                                </div>
+                                <InlineNotice>{error}</InlineNotice>
                             </div>
                         ) : notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-slate-400 p-12 text-center">

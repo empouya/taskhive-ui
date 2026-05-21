@@ -4,6 +4,7 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 import { getErrorMessage } from '../../../lib/apiError';
 import { teamsApi } from '../teams.api';
 import type { Invitation } from '../teams.types';
+import { InlineNotice } from '../../../components/ui/InlineNotice';
 
 export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { activeTeam } = useTeam();
@@ -113,11 +114,8 @@ export const InviteManagerDrawer: React.FC<{ isOpen: boolean; onClose: () => voi
               </div>
             </form>
 
-            {error && (
-              <div className="mt-3 p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
-                {error}
-              </div>
-            )}
+            {error && <div className="mt-3"><InlineNotice>{error}</InlineNotice></div>}
+
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-4">

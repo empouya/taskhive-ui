@@ -5,12 +5,15 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 import { getErrorMessage } from '../../../lib/apiError';
 import { teamsApi } from '../teams.api';
 import type { Member } from '../teams.types';
+import { useConfirm } from '../../../app/providers/ConfirmProvider';
+import { InlineNotice } from '../../../components/ui/InlineNotice';
 
 export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { activeTeam } = useTeam();
   const { user: currentUser } = useAuth();
   const [members, setMembers] = useState<Member[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { confirm } = useConfirm();
 
   const isAdmin = activeTeam?.role === 'ADMIN';
   const isLoading = isOpen && members === null && !error;
@@ -47,7 +50,19 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
   }, [isOpen, activeTeam]);
 
   const handleRemove = async (userId: number) => {
-    if (!window.confirm('Are you sure you want to remove this member?') || !activeTeam) {
+    if (!activeTeam) {
+      return;
+    }
+
+    const shouldRemove = await confirm({
+      title: 'Remove Member',
+      description: 'This member will lose access to the team and its projects.',
+      confirmLabel: 'Remove Member',
+      cancelLabel: 'Cancel',
+      tone: 'danger',
+    });
+
+    if (!shouldRemove) {
       return;
     }
 
@@ -72,11 +87,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {error && (
-              <div className="p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
-                {error}
-              </div>
-            )}
+            {error && <InlineNotice>{error}</InlineNotice>}
 
             {isLoading ? (
               <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />

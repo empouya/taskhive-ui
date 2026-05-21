@@ -7,10 +7,12 @@ import { TaskDetailDrawer } from '../components/TaskDetailDrawer';
 import { TaskRow } from '../components/TaskRow';
 import { tasksApi } from '../tasks.api';
 import type { Task, UpdateTaskPayload } from '../tasks.types';
+import { useConfirm } from '../../../app/providers/ConfirmProvider';
 
 export const TaskListPage: React.FC = () => {
   const { projectId } = useParams();
   const { access } = useAuth();
+  const { confirm } = useConfirm();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,6 +124,18 @@ export const TaskListPage: React.FC = () => {
 
   const handleDelete = async (taskId: number) => {
     if (!access) return false;
+
+    const shouldDelete = await confirm({
+      title: 'Delete Task',
+      description: 'This will permanently remove the task and its associated activity from your workflow.',
+      confirmLabel: 'Delete Task',
+      cancelLabel: 'Keep Task',
+      tone: 'danger',
+    });
+
+    if (!shouldDelete) {
+      return false;
+    }
 
     const previousTasks = tasks;
     setError(null);

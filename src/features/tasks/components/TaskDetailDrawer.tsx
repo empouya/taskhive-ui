@@ -8,6 +8,8 @@ import { teamsApi } from '../../teams/teams.api';
 import type { Member } from '../../teams/teams.types';
 import { getErrorMessage } from '../../../lib/apiError';
 import { useNotifications } from '../../../app/providers/NotificationProvider';
+import { useConfirm } from '../../../app/providers/ConfirmProvider';
+import { InlineNotice } from '../../../components/ui/InlineNotice';
 
 interface TaskDetailDrawerProps {
   task: Task | null;
@@ -47,6 +49,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
   const { access } = useAuth();
   const { activeTeam } = useTeam();
   const { refreshNotifications } = useNotifications();
+  const { confirm } = useConfirm();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -190,7 +193,15 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
   };
 
   const handleDeleteTask = async () => {
-    if (!window.confirm('Delete this task permanently?')) {
+    const shouldDelete = await confirm({
+      title: 'Delete Task',
+      description: 'This permanently deletes the task. This action cannot be undone.',
+      confirmLabel: 'Delete Task',
+      cancelLabel: 'Cancel',
+      tone: 'danger',
+    });
+
+    if (!shouldDelete) {
       return;
     }
 
@@ -345,11 +356,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
               </div>
             </section>
 
-            {saveError && (
-              <div className="p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
-                {saveError}
-              </div>
-            )}
+            {saveError && <InlineNotice>{saveError}</InlineNotice>}
 
             <section className="space-y-4">
               <div className="flex items-center gap-2 text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
@@ -431,11 +438,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
               </button>
             </form>
 
-            {commentError && (
-              <div className="p-3 text-xs font-medium text-red-500 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg">
-                {commentError}
-              </div>
-            )}
+            {commentError && <InlineNotice>{commentError}</InlineNotice>}
 
             <div className="flex items-center gap-1 text-[10px] text-slate-400">
               <ShieldAlert className="w-3 h-3" />

@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { useTeam } from '../../../app/providers/TeamProvider';
-import { useProjects } from '../../../app/providers/ProjectProvider';
-import { ProjectCard } from '../components/ProjectCard';
 import { Plus, Loader2, FolderPlus, ArchiveRestore } from 'lucide-react';
+import { useConfirm } from '../../../app/providers/ConfirmProvider';
+import { useProjects } from '../../../app/providers/ProjectProvider';
+import { useTeam } from '../../../app/providers/TeamProvider';
+import { InlineNotice } from '../../../components/ui/InlineNotice';
 import { CreateProjectModal } from '../components/CreateProjectModal';
+import { ProjectCard } from '../components/ProjectCard';
 
 export const ProjectsPage: React.FC = () => {
     const { projects, archiveProject, restoreProject, isLoading, error } = useProjects();
     const { activeTeam } = useTeam();
+    const { confirm } = useConfirm();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isAdmin = activeTeam?.role === 'ADMIN';
@@ -15,12 +18,20 @@ export const ProjectsPage: React.FC = () => {
     const archivedProjects = projects.filter((project) => project.is_archived);
 
     const handleArchive = async (id: number) => {
-        if (!window.confirm('Archive this project? It will become read-only.')) return;
+        const shouldArchive = await confirm({
+            title: 'Archive Project',
+            description: 'Archived projects become read-only and move to the archived projects list.',
+            confirmLabel: 'Archive Project',
+            cancelLabel: 'Cancel',
+            tone: 'danger',
+        });
+
+        if (!shouldArchive) return;
 
         try {
             await archiveProject(id);
         } catch {
-            alert('Failed to archive project.');
+            // Provider shows the error inline.
         }
     };
 
@@ -28,7 +39,7 @@ export const ProjectsPage: React.FC = () => {
         try {
             await restoreProject(id);
         } catch {
-            alert('Failed to restore project.');
+            // Provider shows the error inline.
         }
     };
 
@@ -85,11 +96,7 @@ export const ProjectsPage: React.FC = () => {
                 )}
             </div>
 
-            {error && (
-                <div className="p-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-2xl dark:bg-red-900/10 dark:border-red-900/20 dark:text-red-300">
-                    {error}
-                </div>
-            )}
+            {error && <InlineNotice>{error}</InlineNotice>}
 
             <section className="space-y-5">
                 <div className="flex items-center justify-between">
