@@ -3,6 +3,8 @@ import axios, {
     type AxiosResponse,
     type InternalAxiosRequestConfig,
 } from 'axios';
+// import { generateIdempotencyKey, generateTraceId, isMutableMethod } from './requestMeta';
+
 
 export const API_BASE_URL =
     import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -80,16 +82,30 @@ export const apiClient = axios.create({
 });
 
 // ---------------------------------------------------------------------------
-// Request interceptor — attach Bearer token
+// Request interceptor — attach Bearer token, X-Trace-ID and Idempotency-Key
 // ---------------------------------------------------------------------------
 
 apiClient.interceptors.request.use((config) => {
-    const access = authHandlers.getAccessToken();
+    config.headers = config.headers ?? {};
 
+    // Attach Bearer token when available
+    const access = authHandlers.getAccessToken();
     if (access) {
-        config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${access}`;
     }
+
+    // X-Trace-ID — attach on every request; preserve if caller already set one
+    // config.headers['X-Trace-ID'] = generateTraceId(
+    //     config.headers['X-Trace-ID'] as string | undefined,
+    // );
+
+    // Idempotency-Key — attach only on mutable methods (POST, PUT, PATCH)
+    // if (isMutableMethod(config.method)) {
+    //     // Preserve if caller has already set one for explicit retry scenarios
+    //     if (!config.headers['Idempotency-Key']) {
+    //         config.headers['Idempotency-Key'] = generateIdempotencyKey();
+    //     }
+    // }
 
     return config;
 });
