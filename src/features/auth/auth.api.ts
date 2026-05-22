@@ -22,9 +22,14 @@ export const authApi = {
     }
   },
 
-  me: async (): Promise<User> => {
+  me: async (accessToken?: string): Promise<User> => {
     try {
-      const { data } = await apiClient.get<ApiUserDto>('/auth/me/');
+      console.log(accessToken);
+      const { data } = await apiClient.get<ApiUserDto>('/auth/me/', {
+        headers: accessToken
+          ? { Authorization: `Bearer ${accessToken}` }
+          : undefined,
+      });
       return normalizeUser(data);
     } catch (error) {
       throw new Error(getErrorMessage(error, 'Failed to load current user.'));

@@ -89,9 +89,12 @@ apiClient.interceptors.request.use((config) => {
     config.headers = config.headers ?? {};
 
     // Attach Bearer token when available
-    const access = authHandlers.getAccessToken();
-    if (access) {
-        config.headers.Authorization = `Bearer ${access}`;
+    // Only set Authorization if the caller has not already provided one
+    if (!config.headers['Authorization']) {
+        const access = authHandlers.getAccessToken();
+        if (access) {
+            config.headers['Authorization'] = `Bearer ${access}`;
+        }
     }
 
     // X-Trace-ID — attach on every request; preserve if caller already set one
