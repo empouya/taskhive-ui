@@ -1,8 +1,10 @@
+export type TeamRole = 'OWNER' | 'ADMIN' | 'MANAGER' | 'MEMBER' | 'VIEWER';
+
 export interface Team {
   id: number;
   name: string;
   description: string;
-  role: 'ADMIN' | 'MEMBER';
+  role: TeamRole;
 }
 
 export interface TeamContextType {
@@ -15,7 +17,7 @@ export interface TeamContextType {
 export interface Member {
   id: number;
   email: string;
-  role: 'ADMIN' | 'MEMBER';
+  role: TeamRole;
 }
 
 export interface Invitation {
