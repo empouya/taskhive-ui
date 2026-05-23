@@ -11,6 +11,8 @@ interface TeamContextType {
   isLoading: boolean;
   requiresSelection: boolean;
   refreshTeams: () => Promise<void>;
+  updateTeam: (teamId: number, payload: { name: string; description: string }) => Promise<Team>;
+  deleteTeam: (teamId: number) => Promise<void>;
 }
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
@@ -114,6 +116,31 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return teams.length > 1 && !activeTeam;
   }, [teams, activeTeam]);
 
+  const updateTeam = useCallback(
+    async (teamId: number, payload: { name: string; description: string }): Promise<Team> => {
+      const updated = await teamsApi.updateTeam(teamId, payload);
+      setTeams((prev) =>
+        prev.map((team) => (team.id === teamId ? updated : team)),
+      );
+      if (activeTeam?.id === teamId) {
+        handleSetActiveTeam(updated);
+      }
+      return updated;
+    },
+    [activeTeam, handleSetActiveTeam],
+  );
+
+  const deleteTeam = useCallback(
+    async (teamId: number): Promise<void> => {
+      await teamsApi.deleteTeam(teamId);
+      setTeams((prev) => prev.filter((team) => team.id !== teamId));
+      if (activeTeam?.id === teamId) {
+        clearActiveTeam();
+      }
+    },
+    [activeTeam, clearActiveTeam],
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -123,6 +150,8 @@ export const TeamProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         requiresSelection,
         refreshTeams: fetchTeams,
+        updateTeam,
+        deleteTeam,
       }}
     >
       {children}

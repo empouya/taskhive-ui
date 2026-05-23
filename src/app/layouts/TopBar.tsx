@@ -1,28 +1,24 @@
 import React, { useMemo, useState } from 'react';
-import { Bell, LogOut, Users, UserPlus } from 'lucide-react';
+import { Bell, LogOut, Users } from 'lucide-react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../app/providers/AuthProvider';
 import { useNotifications } from '../../app/providers/NotificationProvider';
 import { useProjects } from '../providers/ProjectProvider';
-import { useTeam } from '../providers/TeamProvider';
 import { MembersDrawer } from '../../features/teams/components/MembersDrawer';
-import { InviteManagerDrawer } from '../../features/teams/components/InviteManagementDrawer';
 import { NotificationDrawer } from '../../features/notifications/components/NotificationDrawer';
 import { usePermissions } from '../../hooks/usePermissions';
 
 export const TopBar: React.FC = () => {
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
-  const { activeTeam } = useTeam();
   const { projects } = useProjects();
   const location = useLocation();
   const { projectId } = useParams();
 
   const [isMembersOpen, setIsMembersOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isInvitesOpen, setIsInvitesOpen] = useState(false);
 
-  const { canManageInvites, canManageMembers, role } = usePermissions();
+  const { role } = usePermissions();
   const displayRole = role ?? 'No Team';
 
   const pageTitle = useMemo(() => {
@@ -49,17 +45,6 @@ export const TopBar: React.FC = () => {
       </h2>
 
       <div className="flex items-center gap-4">
-        {canManageInvites && (
-          <button
-            type="button"
-            onClick={() => setIsInvitesOpen(true)}
-            className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors text-sm font-bold"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span className="hidden lg:inline">Manage Invites</span>
-          </button>
-        )}
-
         <button
           type="button"
           onClick={() => setIsMembersOpen(true)}
@@ -104,7 +89,6 @@ export const TopBar: React.FC = () => {
       </div>
 
       <MembersDrawer isOpen={isMembersOpen} onClose={() => setIsMembersOpen(false)} />
-      <InviteManagerDrawer isOpen={isInvitesOpen} onClose={() => setIsInvitesOpen(false)} />
       <NotificationDrawer isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
     </header>
   );

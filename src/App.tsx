@@ -10,6 +10,7 @@ import { CreateTeamPage } from './features/teams/pages/CreateTeamPage';
 import { CreateTaskPage } from './features/tasks/pages/CreateTaskPage';
 import { TeamSelectionPage } from './features/teams/pages/TeamSelectionPage';
 import { AcceptInvitePage } from './features/teams/pages/AcceptInvitePage';
+import { TeamSettingsPage } from './features/teams/pages/TeamSettingsPage';
 import { RootRedirector } from './features/auth/pages/RootRedirector';
 import { ProtectedRoute } from './app/providers/ProtectedRoute';
 import { TeamGuard } from './app/providers/TeamGuard';
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="/projects" element={<ProjectsPage />} />
                 <Route path="/projects/:projectId/tasks/" element={<TaskListPage />} />
                 <Route path="/projects/:projectId/tasks/create" element={<CreateTaskPage />} />
+                <Route path="/settings" element={<TeamSettingsPage />} />
               </Route>
             </Route>
           </Route>

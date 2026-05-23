@@ -22,6 +22,18 @@ export const teamsApi = {
     return data.map(normalizeTeam);
   },
 
+  updateTeam: async (
+    teamId: number | string,
+    payload: { name: string; description: string },
+  ): Promise<Team> => {
+    const { data } = await apiClient.patch<ApiTeamDto>(`/teams/${teamId}/`, payload);
+    return normalizeTeam(data);
+  },
+
+  deleteTeam: async (teamId: number | string): Promise<void> => {
+    await apiClient.delete(`/teams/${teamId}/`);
+  },
+
   getMembers: async (teamId: number | string): Promise<Member[]> => {
     const { data } = await apiClient.get<ApiMemberDto[]>(`/teams/${teamId}/members/`);
     return data.map(normalizeMember);

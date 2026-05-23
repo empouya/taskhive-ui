@@ -1,13 +1,17 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Folder, ChevronRight, Loader2 } from 'lucide-react';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { Folder, ChevronRight, Loader2, Settings } from 'lucide-react';
 import { TeamSwitcher } from '../../features/teams/components/TeamSwitcher';
 import { useProjects } from '../providers/ProjectProvider';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export const Sidebar: React.FC = () => {
   const { projects, isLoading } = useProjects();
   const { projectId } = useParams();
+  const location = useLocation();
   const activeProjectId = projectId ? Number(projectId) : null;
+  const { canManageTeam, canManageInvites, canDeleteTeam } = usePermissions();
+  const showSettings = canManageTeam || canManageInvites || canDeleteTeam;
 
   const activeProjects = projects.filter(p => !p.is_archived);
   const archivedProjects = projects.filter(p => p.is_archived);
@@ -102,6 +106,21 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
       </nav>
+
+      {showSettings && (
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+          <Link
+            to="/settings"
+            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-xl transition-all ${location.pathname === '/settings'
+              ? 'bg-primary text-white shadow-lg shadow-primary/20'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+          >
+            <Settings className="w-4 h-4" />
+            Team Settings
+          </Link>
+        </div>
+      )}
     </aside>
   );
 };
