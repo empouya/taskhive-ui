@@ -1,5 +1,7 @@
 export type ApiId = number;
-export type ApiRole = 'ADMIN' | 'MEMBER' | 'admin' | 'member';
+export type ApiRole =
+    | 'OWNER' | 'ADMIN' | 'MANAGER' | 'MEMBER' | 'VIEWER'
+    | 'owner' | 'admin' | 'manager' | 'member' | 'viewer';
 export type ApiTaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 export type ApiTaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 

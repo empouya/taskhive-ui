@@ -15,7 +15,7 @@ import type {
     UpdateTaskRequestDto,
 } from './contracts';
 import type { AuthResponse, User } from '../features/auth/auth.types';
-import type { Invitation, Member, Team } from '../features/teams/teams.types';
+import type { Invitation, Member, Team, TeamRole } from '../features/teams/teams.types';
 import type { Project } from '../features/projects/projects.types';
 import type {
     Comment,
@@ -27,12 +27,15 @@ import type { Notification } from '../features/notifications/notifications.types
 
 const toNumberId = (value: ApiId | string): number => Number(value);
 
-const normalizeRole = (role: ApiRole | null | undefined): 'ADMIN' | 'MEMBER' => {
+const VALID_ROLES = new Set(['OWNER', 'ADMIN', 'MANAGER', 'MEMBER', 'VIEWER']);
+
+const normalizeRole = (role: ApiRole | null | undefined): TeamRole => {
     if (typeof role !== 'string') {
         return 'MEMBER';
     }
 
-    return role.toUpperCase() === 'ADMIN' ? 'ADMIN' : 'MEMBER';
+    const upper = role.toUpperCase();
+    return VALID_ROLES.has(upper) ? (upper as TeamRole) : 'MEMBER';
 };
 
 export const normalizeUser = (user: ApiUserDto): User => ({
