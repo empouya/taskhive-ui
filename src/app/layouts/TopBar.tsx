@@ -8,6 +8,7 @@ import { useTeam } from '../providers/TeamProvider';
 import { MembersDrawer } from '../../features/teams/components/MembersDrawer';
 import { InviteManagerDrawer } from '../../features/teams/components/InviteManagementDrawer';
 import { NotificationDrawer } from '../../features/notifications/components/NotificationDrawer';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export const TopBar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -21,8 +22,8 @@ export const TopBar: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isInvitesOpen, setIsInvitesOpen] = useState(false);
 
-  const isAdmin = activeTeam?.role === 'ADMIN';
-  const displayRole = isAdmin ? 'Team Admin' : 'Team Member';
+  const { canManageInvites, canManageMembers, role } = usePermissions();
+  const displayRole = role ?? 'No Team';
 
   const pageTitle = useMemo(() => {
     if (location.pathname === '/projects') {
@@ -48,7 +49,7 @@ export const TopBar: React.FC = () => {
       </h2>
 
       <div className="flex items-center gap-4">
-        {isAdmin && (
+        {canManageInvites && (
           <button
             type="button"
             onClick={() => setIsInvitesOpen(true)}
@@ -88,7 +89,7 @@ export const TopBar: React.FC = () => {
         <div className="flex items-center gap-3 pl-4 border-l border-slate-100 dark:border-slate-800">
           <div className="text-right hidden sm:block">
             <p className="text-xs font-bold text-slate-900 dark:text-white">{user?.email}</p>
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${activeTeam?.role === 'ADMIN' ? 'text-primary' : 'text-slate-400'}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${role === 'OWNER' || role === 'ADMIN' ? 'text-primary' : 'text-slate-400'}`}>
               {displayRole}
             </p>
           </div>

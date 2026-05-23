@@ -8,11 +8,13 @@ import { TaskRow } from '../components/TaskRow';
 import { tasksApi } from '../tasks.api';
 import type { Task, UpdateTaskPayload } from '../tasks.types';
 import { useConfirm } from '../../../app/providers/ConfirmProvider';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 export const TaskListPage: React.FC = () => {
   const { projectId } = useParams();
   const { access } = useAuth();
   const { confirm } = useConfirm();
+  const { canCreateTasks } = usePermissions();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -182,12 +184,14 @@ export const TaskListPage: React.FC = () => {
         </div>
 
         <div className="flex gap-2">
-          <Link
-            to={`/projects/${projectId}/tasks/create`}
-            className="flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-all"
-          >
-            <Plus className="w-4 h-4" /> Create Task
-          </Link>
+          {canCreateTasks && (
+            <Link
+              to={`/projects/${projectId}/tasks/create`}
+              className="flex items-center gap-2 bg-primary text-white px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-all"
+            >
+              <Plus className="w-4 h-4" /> Create Task
+            </Link>
+          )}
           <button
             type="button"
             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-500"
@@ -216,7 +220,7 @@ export const TaskListPage: React.FC = () => {
             <p className="text-sm font-medium">
               {query.trim() ? 'No tasks match your search.' : 'No tasks found in this project.'}
             </p>
-            {!query.trim() && (
+            {!query.trim() && canCreateTasks && (
               <Link
                 to={`/projects/${projectId}/tasks/create`}
                 className="mt-2 text-primary text-xs font-bold hover:underline"

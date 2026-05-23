@@ -10,6 +10,7 @@ import { getErrorMessage } from '../../../lib/apiError';
 import { useNotifications } from '../../../app/providers/NotificationProvider';
 import { useConfirm } from '../../../app/providers/ConfirmProvider';
 import { InlineNotice } from '../../../components/ui/InlineNotice';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 interface TaskDetailDrawerProps {
   task: Task | null;
@@ -50,6 +51,7 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
   const { activeTeam } = useTeam();
   const { refreshNotifications } = useNotifications();
   const { confirm } = useConfirm();
+  const { canEditTasks, canDeleteTasks, canAssignTasks, canCreateComments } = usePermissions();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -318,29 +320,35 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Assignee</label>
-                <select
-                  value={editorState.assignee_id ?? ''}
-                  onChange={(e) =>
-                    setEditorState((prev) =>
-                      prev
-                        ? {
-                          ...prev,
-                          assignee_id: e.target.value ? Number(e.target.value) : null,
-                        }
-                        : prev,
-                    )
-                  }
-                  className="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="">
-                    {task.assignee_id === null ? 'Unassigned' : `Current: ${currentAssigneeEmail}`}
-                  </option>
-                  {members.map((member) => (
-                    <option key={member.id} value={member.id}>
-                      {member.email} ({member.role.toLowerCase()})
+                {canAssignTasks ? (
+                  <select
+                    value={editorState.assignee_id ?? ''}
+                    onChange={(e) =>
+                      setEditorState((prev) =>
+                        prev
+                          ? {
+                            ...prev,
+                            assignee_id: e.target.value ? Number(e.target.value) : null,
+                          }
+                          : prev,
+                      )
+                    }
+                    className="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="">
+                      {task.assignee_id === null ? 'Unassigned' : `Current: ${currentAssigneeEmail}`}
                     </option>
-                  ))}
-                </select>
+                    {members.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.email} ({member.role.toLowerCase()})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="h-10 px-3 flex items-center text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    {currentAssigneeEmail}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -400,43 +408,49 @@ export const TaskDetailDrawer: React.FC<TaskDetailDrawerProps> = ({
 
           <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 space-y-3">
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => void handleSaveTask()}
-                disabled={isSavingTask || isDeletingTask || !editorState.title.trim()}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
-              >
-                {isSavingTask ? <Clock className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Save Changes
-              </button>
+              {canEditTasks && (
+                <button
+                  type="button"
+                  onClick={() => void handleSaveTask()}
+                  disabled={isSavingTask || isDeletingTask || !editorState.title.trim()}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                >
+                  {isSavingTask ? <Clock className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Changes
+                </button>
+              )}
 
-              <button
-                type="button"
-                onClick={() => void handleDeleteTask()}
-                disabled={isSavingTask || isDeletingTask}
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors"
-              >
-                {isDeletingTask ? <Clock className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete
-              </button>
+              {canDeleteTasks && (
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteTask()}
+                  disabled={isSavingTask || isDeletingTask}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  {isDeletingTask ? <Clock className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Delete
+                </button>
+              )}
             </div>
 
-            <form onSubmit={handlePostComment} className="relative">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 pr-12 text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all"
-                rows={2}
-              />
-              <button
-                type="submit"
-                disabled={isSubmittingComment || !newComment.trim()}
-                className="absolute right-2 bottom-2 p-2 bg-primary text-white rounded-lg disabled:opacity-50 hover:bg-primary/90 transition-all"
-              >
-                {isSubmittingComment ? <Clock className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </button>
-            </form>
+            {canCreateComments && (
+              <form onSubmit={handlePostComment} className="relative">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 pr-12 text-sm focus:ring-2 focus:ring-primary/20 outline-none resize-none transition-all"
+                  rows={2}
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmittingComment || !newComment.trim()}
+                  className="absolute right-2 bottom-2 p-2 bg-primary text-white rounded-lg disabled:opacity-50 hover:bg-primary/90 transition-all"
+                >
+                  {isSubmittingComment ? <Clock className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </form>
+            )}
 
             {commentError && <InlineNotice>{commentError}</InlineNotice>}
 

@@ -6,14 +6,15 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 import { InlineNotice } from '../../../components/ui/InlineNotice';
 import { CreateProjectModal } from '../components/CreateProjectModal';
 import { ProjectCard } from '../components/ProjectCard';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 export const ProjectsPage: React.FC = () => {
     const { projects, archiveProject, restoreProject, isLoading, error } = useProjects();
     const { activeTeam } = useTeam();
     const { confirm } = useConfirm();
+    const { canManageProjects } = usePermissions();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const isAdmin = activeTeam?.role === 'ADMIN';
     const activeProjects = projects.filter((project) => !project.is_archived);
     const archivedProjects = projects.filter((project) => project.is_archived);
 
@@ -85,7 +86,7 @@ export const ProjectsPage: React.FC = () => {
                     </div>
                 </div>
 
-                {isAdmin && (
+                {canManageProjects && (
                     <button
                         type="button"
                         onClick={() => setIsModalOpen(true)}
@@ -115,11 +116,11 @@ export const ProjectsPage: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white">No active projects</h3>
                         <p className="text-slate-500 mb-6 text-center max-w-xs">
-                            {isAdmin
+                            {canManageProjects
                                 ? 'Get started by creating your first project for the team.'
                                 : "Your team doesn't have any active projects yet."}
                         </p>
-                        {isAdmin && (
+                        {canManageProjects && (
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(true)}
@@ -135,7 +136,7 @@ export const ProjectsPage: React.FC = () => {
                             <ProjectCard
                                 key={project.id}
                                 project={project}
-                                isAdmin={isAdmin}
+                                isAdmin={canManageProjects}
                                 onArchive={handleArchive}
                                 onRestore={handleRestore}
                             />
@@ -167,7 +168,7 @@ export const ProjectsPage: React.FC = () => {
                             <ProjectCard
                                 key={project.id}
                                 project={project}
-                                isAdmin={isAdmin}
+                                isAdmin={canManageProjects}
                                 onArchive={handleArchive}
                                 onRestore={handleRestore}
                             />

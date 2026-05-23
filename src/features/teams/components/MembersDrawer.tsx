@@ -7,15 +7,16 @@ import { teamsApi } from '../teams.api';
 import type { Member } from '../teams.types';
 import { useConfirm } from '../../../app/providers/ConfirmProvider';
 import { InlineNotice } from '../../../components/ui/InlineNotice';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { activeTeam } = useTeam();
   const { user: currentUser } = useAuth();
+  const { canManageMembers } = usePermissions();
   const [members, setMembers] = useState<Member[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { confirm } = useConfirm();
 
-  const isAdmin = activeTeam?.role === 'ADMIN';
   const isLoading = isOpen && members === null && !error;
 
   useEffect(() => {
@@ -107,7 +108,7 @@ export const MembersDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> =
                         </p>
                       </div>
                     </div>
-                    {isAdmin && member.id !== currentUser?.id && (
+                    {canManageMembers && member.id !== currentUser?.id && (
                       <button
                         onClick={() => handleRemove(member.id)}
                         className="p-2 text-slate-300 cursor-pointer hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
