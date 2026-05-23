@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -111,7 +110,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // before any Axios request fires (useMemo runs during render)
   // ------------------------------------------------------------------
 
-  useMemo(() => {
+  useEffect(() => {
     registerApiAuth({
       getAccessToken: () => access,
       refreshAccessToken,
@@ -145,7 +144,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // fetch the current user from the backend
         if (!user) {
           try {
-            console.log(newAccess);
             const me = await authApi.me(newAccess);
             if (isMounted) {
               setUser(me);

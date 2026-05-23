@@ -24,7 +24,6 @@ export const authApi = {
 
   me: async (accessToken?: string): Promise<User> => {
     try {
-      console.log(accessToken);
       const { data } = await apiClient.get<ApiUserDto>('/auth/me/', {
         headers: accessToken
           ? { Authorization: `Bearer ${accessToken}` }

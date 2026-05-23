@@ -6,7 +6,6 @@ import type { CreateProjectPayload, Project } from './projects.types';
 export const projectsApi = {
   list: async (teamId: number | string): Promise<Project[]> => {
     const { data } = await apiClient.get<ApiProjectDto[]>(`/teams/${teamId}/projects/`);
-    console.log(data);
     return data.map(normalizeProject);
   },
 

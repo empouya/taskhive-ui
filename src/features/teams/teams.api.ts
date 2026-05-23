@@ -28,7 +28,7 @@ export const teamsApi = {
   },
 
   removeMember: async (teamId: number | string, userId: number | string) => {
-    await apiClient.delete(`/teams/${teamId}/members/${userId}`);
+    await apiClient.delete(`/teams/${teamId}/members/${userId}/`);
   },
 
   listInvitations: async (teamId: number | string): Promise<Invitation[]> => {
