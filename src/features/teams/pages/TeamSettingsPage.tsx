@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Loader2, Mail, Trash2, Copy, Check, LinkIcon, UserMinus, ShieldCheck } from 'lucide-react';
+import { Loader2, Mail, Trash2, Check, LinkIcon, UserMinus, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTeam } from '../../../app/providers/TeamProvider';
 import { useAuth } from '../../../app/providers/AuthProvider';
