@@ -6,18 +6,23 @@ import { useTeam } from '../../../app/providers/TeamProvider';
 import { getErrorMessage } from '../../../lib/apiError';
 import { teamsApi } from '../teams.api';
 
+type AcceptStatus = 'loading' | 'success' | 'error' | 'invalid';
+
 export const AcceptInvitePage: React.FC = () => {
     const { token } = useParams<{ token: string }>();
     const { access } = useAuth();
     const { refreshTeams } = useTeam();
     const navigate = useNavigate();
 
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('Joining the team...');
-    const hasInvalidToken = !token;
+    const [status, setStatus] = useState<AcceptStatus>(
+        token ? 'loading' : 'invalid',
+    );
+    const [message, setMessage] = useState(
+        token ? 'Joining the team...' : 'No invitation token was found in this link.',
+    );
 
     useEffect(() => {
-        if (hasInvalidToken || !access || !token) {
+        if (!token || !access) {
             return;
         }
 
@@ -28,9 +33,7 @@ export const AcceptInvitePage: React.FC = () => {
                 const response = await teamsApi.acceptInvitation(token);
                 await refreshTeams();
 
-                if (isCancelled) {
-                    return;
-                }
+                if (isCancelled) return;
 
                 setStatus('success');
                 setMessage(response.message);
@@ -39,12 +42,12 @@ export const AcceptInvitePage: React.FC = () => {
                     navigate('/', { replace: true });
                 }, 1500);
             } catch (error: unknown) {
-                if (isCancelled) {
-                    return;
-                }
+                if (isCancelled) return;
 
                 setStatus('error');
-                setMessage(getErrorMessage(error, 'Failed to join team. The link may be expired.'));
+                setMessage(
+                    getErrorMessage(error, 'Failed to join team. The link may be expired or already used.'),
+                );
             }
         };
 
@@ -53,44 +56,53 @@ export const AcceptInvitePage: React.FC = () => {
         return () => {
             isCancelled = true;
         };
-    }, [hasInvalidToken, token, access, refreshTeams, navigate]);
-    if (hasInvalidToken) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
-                <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-xl p-8 text-center space-y-6">
-                    {status === 'loading' && (
-                        <div className="flex flex-col items-center gap-4">
-                            <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                            <h1 className="text-xl font-bold">Processing Invitation</h1>
-                            <p className="text-slate-500 text-sm">{message}</p>
-                        </div>
-                    )}
+    }, [token, access, refreshTeams, navigate]);
 
-                    {status === 'success' && (
-                        <div className="flex flex-col items-center gap-4">
-                            <CheckCircle2 className="w-12 h-12 text-emerald-500" />
-                            <h1 className="text-xl font-bold">Welcome to the team!</h1>
-                            <p className="text-slate-500 text-sm">{message}</p>
-                            <p className="text-xs text-primary animate-pulse">Redirecting to your workspace...</p>
-                        </div>
-                    )}
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
+            <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-xl p-8 text-center space-y-6">
 
-                    {status === 'error' && (
-                        <div className="flex flex-col items-center gap-4">
-                            <AlertCircle className="w-12 h-12 text-red-500" />
-                            <h1 className="text-xl font-bold">Invitation Error</h1>
-                            <p className="text-slate-500 text-sm">{message}</p>
-                            <button
-                                type="button"
-                                onClick={() => navigate('/teams/select')}
-                                className="cursor-pointer mt-4 px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold"
-                            >
-                                Team Selection
-                            </button>
-                        </div>
-                    )}
-                </div>
+                {status === 'loading' && (
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                            Processing Invitation
+                        </h1>
+                        <p className="text-slate-500 text-sm">{message}</p>
+                    </div>
+                )}
+
+                {status === 'success' && (
+                    <div className="flex flex-col items-center gap-4">
+                        <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                            Welcome to the team!
+                        </h1>
+                        <p className="text-slate-500 text-sm">{message}</p>
+                        <p className="text-xs text-primary animate-pulse">
+                            Redirecting to your workspace...
+                        </p>
+                    </div>
+                )}
+
+                {(status === 'error' || status === 'invalid') && (
+                    <div className="flex flex-col items-center gap-4">
+                        <AlertCircle className="w-12 h-12 text-red-500" />
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                            {status === 'invalid' ? 'Invalid Invitation Link' : 'Invitation Error'}
+                        </h1>
+                        <p className="text-slate-500 text-sm">{message}</p>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/teams/select')}
+                            className="mt-4 px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                            Go to Team Selection
+                        </button>
+                    </div>
+                )}
+
             </div>
-        );
-    };
+        </div>
+    );
 };
